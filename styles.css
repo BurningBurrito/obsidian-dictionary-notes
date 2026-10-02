@@ -1,1 +1,38 @@
 /* Dictionary Notes styles. Use Obsidian CSS variables so themes apply. */
+
+.dictionary-notes-search-input {
+	width: 100%;
+}
+
+.dictionary-notes-message {
+	margin-top: var(--size-4-2);
+	color: var(--text-muted);
+}
+
+.dictionary-notes-message.is-error {
+	color: var(--text-error);
+}
+
+.dictionary-notes-suggestions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-4-2);
+	margin-top: var(--size-4-2);
+	color: var(--text-normal);
+}
+
+.dictionary-notes-sense.is-subsense {
+	padding-inline-start: var(--size-4-6);
+}
+
+.dictionary-notes-sense-pos {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-accent);
+}
+
+.dictionary-notes-sense-example {
+	font-size: var(--font-ui-smaller);
+	font-style: italic;
+	color: var(--text-muted);
+}
