@@ -181,9 +181,26 @@ export class DictionaryNotesSettingTab extends PluginSettingTab {
 		switch (type.id) {
 			case 'definitions':
 				return this.definitionItems();
+			case 'idioms':
+				return this.idiomItems();
 			default:
 				return [];
 		}
+	}
+
+	private idiomItems(): SettingGroupItem<SettingKey>[] {
+		return [
+			{
+				name: 'Source',
+				desc: 'Idioms come from Wiktionary (English only, no account needed). Each lookup sends what you type to Wiktionary.',
+			},
+			{
+				name: 'Use a backup source',
+				desc: 'If Wiktionary fails, look up the exact idiom in Free Dictionary API instead.',
+				aliases: ['idiom backup source'],
+				control: { type: 'toggle', key: 'idiomUseFallback' },
+			},
+		];
 	}
 
 	private definitionItems(): SettingGroupItem<SettingKey>[] {
