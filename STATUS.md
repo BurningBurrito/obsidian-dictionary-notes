@@ -1,50 +1,55 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Phase 2 — Scaffold (complete; waiting for first test in Obsidian), then Phase 3 — Build
+**Current phase:** Phase 3 — Build (features complete; waiting for test in Obsidian)
 **Last updated:** 2026-10-02
 
 ## Done
 - [x] Phase 1: researched reference plugin + dictionary sources; plan approved
-- [x] Verified current naming rules from the official linter (`eslint-plugin-obsidianmd` validateManifest):
-      id/name/description must not contain "obsidian" or "plugin"; description 10–250 chars, capital first,
-      ends with ".", only letters/digits/spaces and `. , ! ? ' " -`; only known manifest keys allowed
-- [x] Checked name availability against the 8,302 plugins in community-plugins.json
-- [x] Scaffolded from obsidianmd/obsidian-sample-plugin (commit 07ceb81, 2026-08-02); sample code removed
-- [x] manifest.json / package.json / versions.json filled in; MIT LICENSE
-- [x] npm install; `npm audit fix` cleared the 3 high-severity dev-tool advisories
-- [x] Obsidian types updated 1.12.3 → 1.13.1 (lockfile from sample was stale)
-- [x] Minimal plugin: command "Create new word note", ribbon icon, declarative settings tab (note folder)
-- [x] `npm run build` and `npm run lint` both pass with zero warnings
-- [x] Test vault at `test-vault/` (gitignored) with Hot Reload 0.3.1; dev builds auto-copy into it
-- [x] `git init` (branch `main`), first local commit
+- [x] Phase 2: scaffold from official sample, naming rules verified, test vault + Hot Reload, first commit
+- [x] User confirmed the skeleton loads in the test vault (command shows notice)
+- [x] Phase 3 code:
+  - Sources: Free Dictionary API (default), Wiktionary REST (backup), Merriam-Webster (key via SecretStorage)
+  - Automatic fallback to the backup source (setting, default on); lowercase retry for case-sensitive sources
+  - Errors with user-facing messages: offline, network failure, 15 s timeout, not found (+ MW spelling
+    suggestions), rate limit (429 + Retry-After), server error (5xx), unreadable response, missing/invalid key
+  - Search modal (pre-filled with selected text; errors shown inline so you can retry)
+  - Definition picker (filterable SuggestModal; sub-senses indented)
+  - Template engine: 15 variables + {{date}}/{{time}} with moment formats; YAML-safe values in frontmatter
+  - Note creation: safe file names, folder auto-created, "already exists" → open it or create "word 2"
+  - Declarative settings: folder, template file, "create editable template" action, existing-note behavior,
+    open after creating, source, MW key (shown only for MW), language, backup source
+- [x] `npm run build` + `npm run lint` clean
+- [x] Scratch test harness (not in repo): 39/39 checks pass against live APIs + simulated failures
 
 ## In progress
-- [ ] User opens test vault in Obsidian and confirms the skeleton loads
+- [ ] User tests milestone 2 in the test vault
 
 ## Next
-- [ ] Phase 3: data model + source interface; freedictionaryapi.com client (requestUrl)
-- [ ] Search modal → result picker (SuggestModal) → template rendering → note creation
-- [ ] Wiktionary REST backup source + automatic fallback setting (default on)
-- [ ] Merriam-Webster source with key stored via Obsidian SecretStorage
-- [ ] Error handling: offline, not found, rate limit (429), note already exists, bad/missing key
-- [ ] README with network-use disclosure (required by developer policies) + attribution (CC BY-SA, freedictionaryapi.com)
+- [ ] Fix anything found in testing
+- [ ] Optional: user gets a free Merriam-Webster key to test that source live
+- [ ] Phase 4: README (features, install, settings, variables, network-use disclosure, attribution),
+      GitHub repo via gh (ask public/private + confirm name), push, release workflow check
 
 ## Decisions made
-- Name **Dictionary Notes**, ID **dictionary-notes** (user's pick; ID can never change after release).
-- Sources: freedictionaryapi.com default; Wiktionary REST backup with auto-fallback (setting, default on);
-  Merriam-Webster optional bring-your-own-key, included in v1.0. (User approved Phase 1 plan.)
-- Write our own code; reference plugin is a design guide only (credit as inspiration in README).
-- **minAppVersion 1.13.0**: use the new declarative settings API (`getSettingDefinitions`), which
-  deprecates `display()` and makes settings searchable. New plugin, no legacy users, so no dual code path.
-- API keys go in Obsidian's SecretStorage (since 1.11.4), not plaintext data.json.
-- `isDesktopOnly: false`: only Obsidian APIs (requestUrl), no Node/Electron, so it can work on mobile.
-- Test vault lives inside the project but is gitignored (it will hold settings/keys). esbuild's dev
-  mode copies main.js/manifest.json/styles.css into it; Hot Reload reloads the plugin on change.
-- Kept npm's new install-script blocking: esbuild works without its postinstall script.
-- Ignored remaining `moment` audit advisories: npm's "fix" is a downgrade to obsidian 0.14.5, and
-  moment is provided by Obsidian at runtime, not bundled.
+- Name **Dictionary Notes**, ID **dictionary-notes** (ID can never change after release).
+- Sources: Free Dictionary API default; Wiktionary backup; Merriam-Webster optional (v1.0).
+- Fallback also triggers on "not found" and on a missing MW key (with a notice saying so), but not when
+  offline (the backup would fail the same way). If the backup also fails, the main source's error is shown.
+- minAppVersion 1.13.0 for declarative settings; API key in SecretStorage (settings store only its name).
+- Wiktionary: send `Api-User-Agent` with contact URL but keep Obsidian's own User-Agent. Wikimedia limits
+  unidentified clients to 10 req/min and browser clients to 200 req/min, and keys anonymous limits by
+  User-Agent, so a custom UA could make all plugin users share one bucket.
+- Wiktionary lists each sub-sense twice (nested + top-level); nesting is used only to mark depth.
+- Frontmatter: whole-value placeholders are emitted as YAML-safe scalars/lists; unknown placeholders are
+  left untouched (so other template plugins still work).
+- "Note already exists" default: open the existing note (never overwrite).
+- Ribbon icon always added; Obsidian lets users hide ribbon icons (right-click ribbon), so no extra setting.
+- Test vault inside project but gitignored; dev builds auto-copy into it; Hot Reload.
 - Local git commits at milestones (user approved); nothing pushed until Phase 4.
 
 ## Open questions / blockers
+- Merriam-Webster parser tested on documented sample data only (no key yet).
+- Wiktionary `Api-User-Agent` names `https://github.com/BurningBurrito/dictionary-notes`; keep the repo name
+  in Phase 4 or update the constant in src/sources/wiktionary.ts.
 - Phase 5: submission now goes through Obsidian's developer dashboard with automated review
-  (announced 2026-05-12); obsidian-releases no longer has the PR validation workflow. Verify process then.
-- `{{etymology}}` only filled by Merriam-Webster; free sources lack it.
+  (announced 2026-05-12). Verify the process then.
+- `{{etymology}}` and `{{audio}}` are only filled by Merriam-Webster.
