@@ -9,8 +9,8 @@ export type LookupErrorKind =
 	| 'config';
 
 /**
- * A failed dictionary lookup. `message` is written for the user and is shown
- * as-is in the search modal.
+ * A failed lookup (definition, idiom, or quote). `message` is written for the
+ * user and is shown as-is in the search modal or a notice.
  */
 export class LookupError extends Error {
 	kind: LookupErrorKind;
@@ -34,6 +34,6 @@ export function toLookupError(err: unknown): LookupError {
 	console.error('Dictionary Notes: unexpected lookup error', err);
 	return new LookupError(
 		'bad-response',
-		'Something went wrong while looking up the word. See the developer console for details.',
+		'Something went wrong during the lookup. See the developer console for details.',
 	);
 }

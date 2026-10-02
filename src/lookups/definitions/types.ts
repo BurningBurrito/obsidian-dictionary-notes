@@ -1,15 +1,6 @@
-export type SourceId = 'free-dictionary' | 'wiktionary' | 'merriam-webster';
+import { Sense } from '../senses';
 
-/** One meaning of a word, e.g. "run" as a verb meaning "to move swiftly". */
-export interface Sense {
-	partOfSpeech: string;
-	definition: string;
-	examples: string[];
-	synonyms: string[];
-	antonyms: string[];
-	/** 0 for a main sense, 1 for a sub-sense of the main sense before it. */
-	depth: 0 | 1;
-}
+export type SourceId = 'free-dictionary' | 'wiktionary' | 'merriam-webster';
 
 /** Everything one dictionary source returned for a word. */
 export interface WordEntry {

@@ -1,27 +1,38 @@
 import { App, SuggestModal } from 'obsidian';
-import { Sense, WordEntry } from '../types';
 
-/** Let the user pick one sense of a word. Resolves with null if they cancel. */
-export function chooseSense(app: App, entry: WordEntry): Promise<Sense | null> {
+export interface PickOptions<T> {
+	items: T[];
+	placeholder: string;
+	/** Shown when the filter matches nothing. */
+	emptyText: string;
+	/** Fill in one row of the list. */
+	render(item: T, el: HTMLElement): void;
+	/** Whether an item matches the filter text (trimmed, lowercased, never empty). */
+	matches(item: T, query: string): boolean;
+}
+
+/**
+ * Let the user pick one item from a list they can filter by typing.
+ * Resolves with null if they cancel.
+ */
+export function pickItem<T>(app: App, options: PickOptions<T>): Promise<T | null> {
 	return new Promise((resolve) => {
-		new SenseModal(app, entry, resolve).open();
+		new PickModal(app, options, resolve).open();
 	});
 }
 
-class SenseModal extends SuggestModal<Sense> {
-	private entry: WordEntry;
-	private done: (sense: Sense | null) => void;
+class PickModal<T> extends SuggestModal<T> {
+	private options: PickOptions<T>;
+	private done: (item: T | null) => void;
 	private chosen = false;
 
-	constructor(app: App, entry: WordEntry, done: (sense: Sense | null) => void) {
+	constructor(app: App, options: PickOptions<T>, done: (item: T | null) => void) {
 		super(app);
-		this.entry = entry;
+		this.options = options;
 		this.done = done;
-		this.limit = entry.senses.length;
-		this.emptyStateText = 'No definitions match.';
-		this.setPlaceholder(
-			`Choose a definition of "${entry.word}" (${entry.senses.length} found). Type to filter.`,
-		);
+		this.limit = options.items.length;
+		this.emptyStateText = options.emptyText;
+		this.setPlaceholder(options.placeholder);
 		this.setInstructions([
 			{ command: '↑↓', purpose: 'to navigate' },
 			{ command: '↵', purpose: 'to choose' },
@@ -29,29 +40,19 @@ class SenseModal extends SuggestModal<Sense> {
 		]);
 	}
 
-	getSuggestions(query: string): Sense[] {
+	getSuggestions(query: string): T[] {
 		const q = query.trim().toLowerCase();
-		if (!q) return this.entry.senses;
-		return this.entry.senses.filter(
-			(s) =>
-				s.definition.toLowerCase().includes(q) || s.partOfSpeech.toLowerCase().includes(q),
-		);
+		if (!q) return this.options.items;
+		return this.options.items.filter((item) => this.options.matches(item, q));
 	}
 
-	renderSuggestion(sense: Sense, el: HTMLElement) {
-		el.addClass('dictionary-notes-sense');
-		el.toggleClass('is-subsense', sense.depth === 1);
-		if (sense.partOfSpeech) {
-			el.createDiv({ cls: 'dictionary-notes-sense-pos', text: sense.partOfSpeech });
-		}
-		el.createDiv({ text: sense.definition });
-		const example = sense.examples[0];
-		if (example) el.createDiv({ cls: 'dictionary-notes-sense-example', text: example });
+	renderSuggestion(item: T, el: HTMLElement) {
+		this.options.render(item, el);
 	}
 
-	onChooseSuggestion(sense: Sense) {
+	onChooseSuggestion(item: T) {
 		this.chosen = true;
-		this.done(sense);
+		this.done(item);
 	}
 
 	onClose() {
