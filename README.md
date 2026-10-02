@@ -4,14 +4,6 @@ Look up a word in a dictionary and create a note from its definition using your 
 
 Type a word, pick the meaning you want, and Dictionary Notes creates a note named after the word, in the folder you choose, filled in from a template you can customize.
 
-<!--
-Screenshots to add (save them in docs/ and uncomment):
-![Search window](docs/search.png)
-![Choosing a definition](docs/choose-definition.png)
-![A created word note](docs/word-note.png)
--->
-_Screenshots coming soon._
-
 ## Features
 
 - **Quick lookup:** run **Create new word note** from the command palette or select the book icon in the ribbon. If you have text selected in a note, it's used as the search word.
@@ -38,7 +30,7 @@ Requires Obsidian 1.13.0 or later.
 ### Manually
 
 1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/BurningBurrito/obsidian-dictionary-notes/releases/latest).
-2. Copy them to `<your vault>/.obsidian/plugins/dictionary-notes/`.
+2. In your vault folder, create the folder `.obsidian/plugins/dictionary-notes/` and copy the three files into it.
 3. Reload Obsidian, then enable **Dictionary Notes** in **Settings → Community plugins**.
 
 ## Usage
