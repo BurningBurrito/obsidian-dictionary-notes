@@ -1,6 +1,6 @@
 {
 	"name": "dictionary-notes",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Look up a word in a dictionary and create a note from its definition using your own template.",
 	"main": "main.js",
 	"type": "module",
