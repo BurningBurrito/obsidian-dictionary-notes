@@ -1,4 +1,4 @@
-import { LookupError, notFoundError, toLookupError } from '../errors';
+import { LookupError, notFoundError, toLookupError } from '../../../core/errors';
 import { DictionarySource, LookupOptions, SourceId, WordEntry } from '../types';
 import { freeDictionary } from './free-dictionary';
 import { merriamWebster } from './merriam-webster';

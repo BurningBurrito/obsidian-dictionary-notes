@@ -1,18 +1,17 @@
 import { App, normalizePath, TFile, TFolder } from 'obsidian';
-import { DEFAULT_TEMPLATE } from './template';
 
 // Characters that aren't allowed in file names on some systems, or that break
 // Obsidian links (# ^ [ ] |).
 const ILLEGAL_FILENAME_CHARS = /[\\/:*?"<>|#^[\]]/g;
 
-/** A safe note name for a word, e.g. "AC/DC" -> "AC DC". */
-export function noteBaseName(word: string): string {
-	const name = word
+/** A safe note name, e.g. "AC/DC" -> "AC DC". */
+export function noteBaseName(title: string, fallback = 'Untitled word'): string {
+	const name = title
 		.replace(ILLEGAL_FILENAME_CHARS, ' ')
 		.replace(/\s+/g, ' ')
 		.trim()
 		.replace(/^\.+/, '');
-	return name || 'Untitled word';
+	return name || fallback;
 }
 
 /** Normalized folder path; "" means the vault root. */
@@ -48,13 +47,14 @@ export async function ensureFolder(app: App, folder: string): Promise<void> {
 export async function loadTemplate(
 	app: App,
 	templatePath: string,
+	builtInTemplate: string,
 ): Promise<{ template: string; missing: boolean }> {
 	const path = templatePath.trim();
-	if (!path) return { template: DEFAULT_TEMPLATE, missing: false };
+	if (!path) return { template: builtInTemplate, missing: false };
 	const file =
 		app.vault.getFileByPath(normalizePath(path)) ??
 		app.vault.getFileByPath(normalizePath(`${path}.md`));
-	if (!file) return { template: DEFAULT_TEMPLATE, missing: true };
+	if (!file) return { template: builtInTemplate, missing: true };
 	return { template: await app.vault.cachedRead(file), missing: false };
 }
 

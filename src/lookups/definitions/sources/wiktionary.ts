@@ -1,13 +1,12 @@
-import { notFoundError } from '../errors';
-import { DictionarySource, Sense, WordEntry } from '../types';
-import { collapseWhitespace, uniqueStrings } from '../utils';
-import { badResponse, httpGet, parseJson } from './http';
+import { notFoundError } from '../../../core/errors';
+import { elementText, htmlToText, parseHtml } from '../../../core/html';
+import { badResponse, httpGet, parseJson } from '../../../core/http';
+import { uniqueStrings } from '../../../core/utils';
+import { WIKIMEDIA_HEADERS } from '../../../core/wikimedia';
+import { Sense } from '../../senses';
+import { DictionarySource, WordEntry } from '../types';
 
 const NAME = 'Wiktionary';
-
-// Wikimedia asks API clients to identify themselves.
-// https://meta.wikimedia.org/wiki/User-Agent_policy
-const API_USER_AGENT = 'DictionaryNotes (https://github.com/BurningBurrito/obsidian-dictionary-notes)';
 
 // Shape of https://en.wiktionary.org/api/rest_v1/page/definition/{word}:
 // an object keyed by language code; definitions are HTML snippets.
@@ -26,7 +25,7 @@ export const wiktionary: DictionarySource = {
 	name: NAME,
 	async lookup(word, { language }) {
 		const url = `https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(word)}`;
-		const response = await httpGet(url, NAME, { 'Api-User-Agent': API_USER_AGENT });
+		const response = await httpGet(url, NAME, WIKIMEDIA_HEADERS);
 		if (response.status === 404) throw notFoundError(word);
 		if (response.status !== 200) throw badResponse(NAME);
 		const entry = parseWiktionary(parseJson(response, NAME) as WkResponse, word, language);
@@ -77,23 +76,11 @@ export function parseWiktionary(
 	};
 }
 
-// Wiktionary definitions sometimes nest sub-senses in an <ol>. DOMParser builds
-// an inert document (no scripts run, no images load), so it's safe for reading text.
+// Wiktionary definitions sometimes nest sub-senses in an <ol>.
 function parseDefinitionHtml(html: string): { text: string; subsenses: string[] } {
-	const root = new DOMParser().parseFromString(html, 'text/html').body;
+	const root = parseHtml(html);
 	const subsenses = Array.from(root.querySelectorAll(':scope > ol > li'))
 		.map((li) => elementText(li))
 		.filter(Boolean);
 	return { text: elementText(root), subsenses };
-}
-
-function htmlToText(html: string): string {
-	return elementText(new DOMParser().parseFromString(html, 'text/html').body);
-}
-
-/** Text of an element without its nested lists (sub-senses and quotations). */
-function elementText(el: Element): string {
-	const copy = el.cloneNode(true) as Element;
-	copy.querySelectorAll('ol, ul, dl, style, sup.reference').forEach((n) => n.remove());
-	return collapseWhitespace(copy.textContent ?? '');
 }

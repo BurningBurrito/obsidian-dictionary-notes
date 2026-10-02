@@ -1,74 +1,9 @@
 import { moment } from 'obsidian';
-import { Sense, WordEntry } from '../types';
-import { collapseWhitespace } from '../utils';
-
-export const DEFAULT_TEMPLATE = `---
-word: {{word}}
-part-of-speech: {{partOfSpeech}}
-phonetic: {{phonetic}}
-synonyms: {{synonyms}}
-source: {{source}}
-created: {{date}}
-tags:
-  - dictionary
----
-**{{partOfSpeech}}** {{phonetic}}
-
-> {{definition}}
-
-{{examples}}
-
-## All definitions
-
-{{allDefinitions}}
-
----
-Source: [{{source}}]({{sourceUrl}}), {{license}}
-`;
+import { collapseWhitespace } from './utils';
 
 /** A list renders as "a, b, c" in the note body and as a YAML list in frontmatter. */
 export type TemplateValue = string | string[];
 export type TemplateVariables = Record<string, TemplateValue>;
-
-export function buildVariables(entry: WordEntry, sense: Sense): TemplateVariables {
-	return {
-		word: entry.word,
-		definition: sense.definition,
-		partOfSpeech: sense.partOfSpeech,
-		phonetic: entry.phonetic,
-		example: sense.examples[0] ?? '',
-		examples: sense.examples.map((e) => `- *${e}*`).join('\n'),
-		synonyms: sense.synonyms.length ? sense.synonyms : entry.synonyms,
-		antonyms: sense.antonyms.length ? sense.antonyms : entry.antonyms,
-		etymology: entry.etymology,
-		audio: entry.audioUrl,
-		allDefinitions: formatAllDefinitions(entry.senses),
-		source: entry.source.name,
-		sourceUrl: entry.source.url,
-		license: entry.source.license,
-		licenseUrl: entry.source.licenseUrl,
-	};
-}
-
-/** Every sense, grouped by part of speech, as numbered Markdown lists. */
-function formatAllDefinitions(senses: Sense[]): string {
-	const groups = new Map<string, Sense[]>();
-	for (const sense of senses) {
-		const key = sense.partOfSpeech || 'other';
-		groups.set(key, [...(groups.get(key) ?? []), sense]);
-	}
-	const blocks: string[] = [];
-	for (const [partOfSpeech, group] of groups) {
-		const lines = [`**${partOfSpeech}**`, ''];
-		let number = 0;
-		for (const sense of group) {
-			if (sense.depth === 1 && number > 0) lines.push(`\t- ${sense.definition}`);
-			else lines.push(`${++number}. ${sense.definition}`);
-		}
-		blocks.push(lines.join('\n'));
-	}
-	return blocks.join('\n\n');
-}
 
 // {{name}} or {{name:format}}, e.g. {{date:YYYY-MM-DD}}
 const PLACEHOLDER = /\{\{\s*(\w+)\s*(?::([^}]*))?\}\}/g;

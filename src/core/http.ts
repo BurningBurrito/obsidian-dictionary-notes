@@ -1,5 +1,5 @@
 import { requestUrl, RequestUrlResponse } from 'obsidian';
-import { LookupError } from '../errors';
+import { LookupError } from './errors';
 
 const TIMEOUT_MS = 15_000;
 

@@ -1,60 +1,70 @@
 import { Notice } from 'obsidian';
+import type { LookupType } from '../lookups/lookup-type';
 import type DictionaryNotesPlugin from '../main';
+import { openSearchModal } from '../ui/search-modal';
+import { toLookupError } from './errors';
 import {
 	ensureFolder,
 	loadTemplate,
 	nextFreePath,
 	normalizeFolder,
-	noteBaseName,
 	notePath,
 	openNote,
-} from '../notes/create-note';
-import { buildVariables, renderTemplate } from '../notes/template';
-import { lookupWord } from '../sources';
-import { openSearchModal } from '../ui/search-modal';
-import { chooseSense } from '../ui/sense-modal';
+} from './notes';
+import { renderTemplate } from './render';
 
-/** Search → pick a definition → create the note from the template. */
-export async function createWordNote(plugin: DictionaryNotesPlugin): Promise<void> {
+/**
+ * Search → pick → create the note from the template. The same steps for every
+ * lookup type; see LookupType for what each type supplies.
+ */
+export async function createDictionaryNote<Found, Item, Detail>(
+	plugin: DictionaryNotesPlugin,
+	type: LookupType<Found, Item, Detail>,
+): Promise<void> {
 	const { app, settings } = plugin;
+	const modeKey = type.searchModeKey;
 
-	const found = await openSearchModal(app, selectedWord(plugin), (word) =>
-		lookupWord(
-			word,
-			settings.source,
-			{ language: settings.language, apiKey: plugin.getApiKey() },
-			settings.useFallback,
-		),
+	const found = await openSearchModal(
+		app,
+		{
+			...type.search,
+			initialQuery: selectedText(plugin),
+			initialMode: modeKey ? settings[modeKey] : undefined,
+			onModeChange: modeKey
+				? (mode) => {
+						settings[modeKey] = mode;
+						void plugin.saveSettings();
+					}
+				: undefined,
+		},
+		(query, mode) => type.find(query, plugin, mode),
 	);
-	if (!found) return;
+	if (found === null) return;
 
-	const { entry, fallback } = found;
-	if (fallback) {
-		new Notice(
-			`${fallback.error.message}\nShowing results from ${entry.source.name} instead.`,
-			8000,
-		);
-	}
+	const message = type.notice?.(found);
+	if (message) new Notice(message, 8000);
 
-	const folder = normalizeFolder(settings.folder);
-	const baseName = noteBaseName(entry.word);
+	const item = await showFailure(() => type.chooseItem(app, found));
+	if (item === null) return;
+
+	const folder = normalizeFolder(settings[type.settingKeys.folder]);
+	const baseName = type.noteName(item);
 	const existing = app.vault.getFileByPath(notePath(folder, baseName));
 	if (existing && settings.ifNoteExists === 'open') {
-		new Notice(`A note for "${entry.word}" already exists. Opening it.`);
+		new Notice(`A note for "${type.displayName(item)}" already exists. Opening it.`);
 		await openNote(app, existing);
 		return;
 	}
 
-	const sense = entry.senses.length > 1 ? await chooseSense(app, entry) : entry.senses[0];
-	if (!sense) return;
+	const detail = await showFailure(() => type.chooseDetail(app, item));
+	if (detail === null) return;
 
-	const { template, missing } = await loadTemplate(app, settings.templateFile);
+	const templateFile = settings[type.settingKeys.templateFile];
+	const { template, missing } = await loadTemplate(app, templateFile, type.defaultTemplate);
 	if (missing) {
-		new Notice(
-			`Template "${settings.templateFile}" was not found, so the built-in template was used.`,
-		);
+		new Notice(`Template "${templateFile}" was not found, so the built-in template was used.`);
 	}
-	const content = renderTemplate(template, buildVariables(entry, sense));
+	const content = renderTemplate(template, type.variables(item, detail));
 
 	try {
 		await ensureFolder(app, folder);
@@ -65,12 +75,25 @@ export async function createWordNote(plugin: DictionaryNotesPlugin): Promise<voi
 	} catch (err) {
 		console.error('Dictionary Notes: could not create note', err);
 		const reason = err instanceof Error ? err.message : String(err);
-		new Notice(`Could not create the note for "${entry.word}": ${reason}`);
+		new Notice(`Could not create the note for "${type.displayName(item)}": ${reason}`);
+	}
+}
+
+/**
+ * Run a step that may fetch more data after the search window has closed.
+ * A failure is shown as a notice; returns null when cancelled or failed.
+ */
+async function showFailure<T>(step: () => Promise<T | null>): Promise<T | null> {
+	try {
+		return await step();
+	} catch (err) {
+		new Notice(toLookupError(err).message);
+		return null;
 	}
 }
 
 /** The selected text in the active editor, if it looks like a single word or phrase. */
-function selectedWord(plugin: DictionaryNotesPlugin): string {
+function selectedText(plugin: DictionaryNotesPlugin): string {
 	const selection = plugin.app.workspace.activeEditor?.editor?.getSelection().trim() ?? '';
 	return selection.length <= 60 && !selection.includes('\n') ? selection : '';
 }

@@ -1,7 +1,8 @@
-import { LookupError, notFoundError } from '../errors';
-import { DictionarySource, Sense, WordEntry } from '../types';
-import { collapseWhitespace, uniqueStrings } from '../utils';
-import { badResponse, httpGet } from './http';
+import { LookupError, notFoundError } from '../../../core/errors';
+import { Sense } from '../../senses';
+import { DictionarySource, WordEntry } from '../types';
+import { collapseWhitespace, uniqueStrings } from '../../../core/utils';
+import { badResponse, httpGet } from '../../../core/http';
 
 const NAME = 'Merriam-Webster';
 
