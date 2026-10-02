@@ -183,9 +183,18 @@ export class DictionaryNotesSettingTab extends PluginSettingTab {
 				return this.definitionItems();
 			case 'idioms':
 				return this.idiomItems();
-			default:
-				return [];
+			case 'quotes':
+				return this.quoteItems();
 		}
+	}
+
+	private quoteItems(): SettingGroupItem<SettingKey>[] {
+		return [
+			{
+				name: 'Source',
+				desc: 'Quotes come from Wikiquote (English only, no account needed). Each search sends what you type to Wikiquote, and Wikidata is asked whether a page is about a person. Disputed and misattributed quotes are labeled.',
+			},
+		];
 	}
 
 	private idiomItems(): SettingGroupItem<SettingKey>[] {
