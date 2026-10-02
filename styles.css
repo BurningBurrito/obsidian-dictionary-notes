@@ -36,3 +36,30 @@
 	font-style: italic;
 	color: var(--text-muted);
 }
+
+/* Search modes (quotes: Keyword, Author, Topic) */
+.dictionary-notes-modes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-4-2);
+	margin-bottom: var(--size-4-3);
+}
+
+/* Quote list */
+.dictionary-notes-quote-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-4-2);
+	margin-top: var(--size-4-1);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.dictionary-notes-badge {
+	padding: 0 var(--size-4-1);
+	border: 1px solid currentColor;
+	border-radius: var(--radius-s);
+	color: var(--text-warning);
+	white-space: nowrap;
+}
