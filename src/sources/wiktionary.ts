@@ -7,7 +7,7 @@ const NAME = 'Wiktionary';
 
 // Wikimedia asks API clients to identify themselves.
 // https://meta.wikimedia.org/wiki/User-Agent_policy
-const API_USER_AGENT = 'DictionaryNotes (https://github.com/BurningBurrito/dictionary-notes)';
+const API_USER_AGENT = 'DictionaryNotes (https://github.com/BurningBurrito/obsidian-dictionary-notes)';
 
 // Shape of https://en.wiktionary.org/api/rest_v1/page/definition/{word}:
 // an object keyed by language code; definitions are HTML snippets.
