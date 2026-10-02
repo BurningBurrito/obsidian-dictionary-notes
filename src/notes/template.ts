@@ -78,6 +78,16 @@ const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
 
 type Resolver = (name: string, format: string | undefined) => TemplateValue | undefined;
 
+/** The one moment.js method this plugin uses. */
+export interface DateFormatter {
+	format(format: string): string;
+}
+
+// Obsidian bundles moment.js. Describing the method we use ourselves keeps type
+// checking working even where moment's own types aren't installed, as in
+// Obsidian's automated plugin review.
+const currentMoment = moment as unknown as () => DateFormatter;
+
 /**
  * Replace {{variables}} in a template. Unknown variables are left untouched so
  * other plugins' template syntax survives. {{date}} and {{time}} accept a
@@ -86,7 +96,7 @@ type Resolver = (name: string, format: string | undefined) => TemplateValue | un
 export function renderTemplate(
 	template: string,
 	variables: TemplateVariables,
-	now: moment.Moment = moment(),
+	now: DateFormatter = currentMoment(),
 ): string {
 	const resolve: Resolver = (name, format) => {
 		if (name === 'date') return now.format(format?.trim() || 'YYYY-MM-DD');

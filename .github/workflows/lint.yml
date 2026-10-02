@@ -25,3 +25,7 @@ jobs:
             - run: npm ci
             - run: npm run build --if-present
             - run: npm run lint
+            # Obsidian's automated review lints without moment's type package
+            # installed; repeat that here so unresolved types are caught first.
+            - name: Lint as Obsidian's review does (without moment types)
+              run: rm -rf node_modules/moment && npm run lint
