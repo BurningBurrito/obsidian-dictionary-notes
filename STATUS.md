@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update 1.x — Idioms and Quotes: Phase 3 (build) done; next Phase 4 (test)
+**Current phase:** Update 1.x — Idioms and Quotes: Phase 4 (test) in progress
 **Last updated:** 2026-10-02
 
 ## Update: Idioms and Quotes (branch `feature/idioms-quotes`)
@@ -59,12 +59,37 @@
     README templates verified identical to the code; no placeholder text
   - build, lint, and lint-without-moment-types all clean (0 warnings)
 
+- [x] Phase 3 approved by user; user approved pushing `feature/idioms-quotes` (not main) for CI and the
+      dashboard's "Review branch" scan
+
+- [x] Phase 4 automated test suite (471bf26): **77 tests, all pass**, offline in ~1 s (`npm test`);
+      `npm run test:record` re-records the real responses (668 KB gzipped in tests/fixtures/http).
+      Covers: settings migration from real 1.0.1 data.json shapes; Definitions vs golden output generated
+      by the 1.0.1 code; idioms (exact/partial/inflected/literal pointer/origin/backup/backup off);
+      Wikiquote parsing (labels by box and by heading, translations, "Quotes about", topic credits,
+      date pages); quote search (author/topic/keyword, people only, author-page check); every error
+      message (offline, unreachable, 429 with/without Retry-After, 5xx, 15 s timeout via mock timers,
+      unreadable JSON, Wiktionary/Wikiquote/Wikidata failures); full flow on an in-memory vault
+      (folder created, nested folders, existing note opened, numbered copy, missing template, folder
+      setting is a file, 1.0.1 folder/template kept, backup notice, cancel, all three types)
+- [x] Tests checked by deliberate breakage: parser box/heading signals, template text, default
+      folder: each caught (added box-only/heading-only tests after the first breakage slipped through
+      because the two signals back each other up)
+- [x] CI runs `npm test` (600a04d); `linkedom` added as an exact dev dependency (ISC, not bundled)
+- [x] `test-vault-upgrade/` (gitignored): real 1.0.1 release assets, build attestation verified
+      (release.yml @ tag 1.0.1, commit 21588c7), plugin enabled, checklist note "Upgrade test.md"
+- [x] Pushed `feature/idioms-quotes` (user approved; main untouched, no tags). CI green on Node 22 and 24
+      (run 37079995026: build, lint, npm test, lint without moment types)
+- [x] Noticed `.obsidian/` in the project root (created 19:39, default config only, likely from opening
+      the project folder as a vault). Left in place; added `/.obsidian/` to .gitignore
+
 ### In progress
-- [ ] Phase 4: test in Obsidian (user) + upgrade path from 1.0.1
+- [ ] User: upgrade test in `test-vault-upgrade/` (configure 1.0.1, upgrade, check carry-over), then I
+      compare data.json before/after and hotkeys.json
+- [ ] User: dashboard **Review branch** scan of `feature/idioms-quotes`; I fix anything it reports
+- [ ] User: manual UI checks in `test-vault/` (search modes, labels, settings layout, ribbon menu, offline)
 
 ### Next
-- [ ] Phase 4: upgrade-test vault with the released 1.0.1, repeatable test suite (fixtures), error cases,
-      Wikiquote "Review branch" preview scan in the dashboard (user)
 - [ ] Phase 5: version bump (recommend 1.1.0), release notes, merge (user approval), GitHub release
 
 ### Decisions made
@@ -101,6 +126,10 @@
 - Name stays "Dictionary Notes"; new description; commands "Create new definition/idiom/quote note".
 
 ### Open questions / blockers
+- `npm audit`: 3 moderate findings in `moment` via the `obsidian` types and lint plugin (dev only,
+  existed before; Obsidian provides moment at runtime). `npm audit fix --force` would downgrade the
+  Obsidian API to 0.14.5, so not applied.
+- Not testable here: mobile (isDesktopOnly false; only Obsidian APIs and DOMParser used).
 - Found while testing (not changed, Definitions must stay identical without approval): the 1.0
   Free Dictionary API source uses the API's unencoded URL, so a multi-word definition lookup
   ("ice cream") gets a source link with raw spaces that breaks the Markdown link. Fixed for idioms.
