@@ -25,6 +25,8 @@ jobs:
             - run: npm ci
             - run: npm run build --if-present
             - run: npm run lint
+            # Offline: answers come from recorded responses in tests/fixtures/http.
+            - run: npm test
             # Obsidian's automated review lints without moment's type package
             # installed; repeat that here so unresolved types are caught first.
             - name: Lint as Obsidian's review does (without moment types)
