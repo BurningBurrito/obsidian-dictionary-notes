@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update 1.x — Idioms and Quotes: Phase 2 design proposed, **waiting for approval**
+**Current phase:** Update 1.x — Idioms and Quotes: Phase 3 (build) done; next Phase 4 (test)
 **Last updated:** 2026-10-02
 
 ## Update: Idioms and Quotes (branch `feature/idioms-quotes`)
@@ -43,13 +43,29 @@
       headings, sentence case. Wikiquote keyword search ranks topic pages above person pages
       (Einstein's page is 6th for his own quote), so credit comes from each quote's citation line;
       Wikidata `wbgetclaims` P31 = Q5 tells whether a page is a person (~240 bytes).
-- [x] Phase 2 design written (summary below)
+- [x] Phase 2 design written (summary below) and **approved with all recommendations**
+- [x] Phase 3 build, in 4 local commits on `feature/idioms-quotes` (not pushed):
+  - M1 restructure (e286e8b): shared flow + `LookupType`; Definitions output proven byte-identical to
+    1.0.1 (13/13 old-vs-new checks: template text, variables, rendered notes, file names)
+  - M2 idioms (9dc4504): live-tested exact match ("Break The Ice." too), partial ("spill beans"),
+    inflected ("kicked the bucket"), literal-pointer filtering ("piece of cake"), clean origin,
+    backup source strips the "idiomatic" label and rejects non-idioms ("table")
+  - M3 quotes (efbc77d): parser tested on saved pages (Einstein 468 quotes: 303 sourced / 110 attributed /
+    12 disputed / 43 misattributed; Franklin "definition of insanity" = Misattributed with note;
+    Courage topic page credits via linked citations; date-page votes skipped; translations use the
+    English text, original kept in `{{original}}`); live: keyword ~1-2 s, author/topic ~0.3 s
+  - M4 docs: manifest + package.json description (approved text, 128 chars), keywords, README rewritten
+    (three types, labels, settings, variables, 5 network services, licensing, "Upgrading from 1.0");
+    README templates verified identical to the code; no placeholder text
+  - build, lint, and lint-without-moment-types all clean (0 warnings)
 
 ### In progress
-- [ ] Waiting for approval of the Phase 2 design
+- [ ] Phase 4: test in Obsidian (user) + upgrade path from 1.0.1
 
 ### Next
-- [ ] Phase 3: build · Phase 4: test (incl. upgrade from 1.0.1) · Phase 5: release (new GitHub release only)
+- [ ] Phase 4: upgrade-test vault with the released 1.0.1, repeatable test suite (fixtures), error cases,
+      Wikiquote "Review branch" preview scan in the dashboard (user)
+- [ ] Phase 5: version bump (recommend 1.1.0), release notes, merge (user approval), GitHub release
 
 ### Decisions made
 - Release path: **already listed**, so updates ship as a normal GitHub release. No new submission.
@@ -64,7 +80,13 @@
 - **English only** for idioms and quotes for now; other languages later.
 - Command ID **`create-word-note` kept** (existing hotkeys keep working).
 
-### Design (proposed, pending approval)
+- Build details (Phase 3): plain search ranks idioms best (finds related idioms too); exact title match
+  skips the list. Author search accepts **people only** (Wikidata Q5), so a topic like "Love" is never
+  credited as an author. On topic pages the author comes only from a **linked** name in the citation
+  (no guessing from text). Results sorted Sourced first. Added `{{original}}` (quote in its original
+  language) beyond the approved variable list.
+
+### Design (approved)
 - Architecture: shared flow (search → choose item → name/exists check → choose detail → render →
   create) in `src/core/`; one module per type in `src/lookups/{definitions,idioms,quotes}/`
   implementing a `LookupType` interface; shared search window + one generic picker in `src/ui/`.
@@ -79,8 +101,11 @@
 - Name stays "Dictionary Notes"; new description; commands "Create new definition/idiom/quote note".
 
 ### Open questions / blockers
-- Design approval, especially: ribbon menu, renaming the definitions command, the new description,
-  and `Templates/Definition note.md` as the new template-copy name.
+- Found while testing (not changed, Definitions must stay identical without approval): the 1.0
+  Free Dictionary API source uses the API's unencoded URL, so a multi-word definition lookup
+  ("ice cream") gets a source link with raw spaces that breaks the Markdown link. Fixed for idioms.
+- The listing description on community.obsidian.md may need updating by hand ("Edit listing") after
+  release; the directory reads manifest.json from `main`.
 
 ---
 
