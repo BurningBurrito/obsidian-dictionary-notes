@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Phase 5 — Release and community submission (release published; waiting for user to submit)
+**Current phase:** Phase 5 — Release and community submission (submitted; 1.0.1 fixes review warnings)
 **Last updated:** 2026-10-02
 
 ## Done
@@ -20,12 +20,21 @@
   - Pre-submission checklist: id/name unique (8,304 plugins), manifest at HEAD ok, README + LICENSE,
     release assets, official lint clean, no fetch/innerHTML/eval/Node APIs, CI green
 
+  - User submitted at community.obsidian.md; automated review gave 2 warnings on 1.0.0:
+    1. `@typescript-eslint/no-unsafe-assignment` at src/notes/template.ts:89. Cause (reproduced locally): the
+       review lints without moment's type package, so `moment()` is error-typed. Fix: a tiny `DateFormatter`
+       type for the one method we use. CI now also lints without moment types.
+    2. README placeholder text (screenshots comment + "coming soon"). Removed; also reworded `<your vault>`.
+  - Released **1.0.1** (user approved): draft verified (manifest 1.0.1, main.js identical to local build,
+    attestation from tag 1.0.1 / 21588c7), published as latest; CI green incl. the new step
+
 ## In progress
-- [ ] User submits at community.obsidian.md (sign in with Obsidian account → link GitHub → add plugin)
+- [ ] User re-checks the review result for 1.0.1 in the dashboard
 
 ## Next
 - [ ] Read the automated review result in the dashboard; fix any failures (new version: `npm version patch`)
-- [ ] Optional: screenshots in docs/ + README; mobile test; Merriam-Webster test with a real key
+- [ ] Optional: real screenshots in docs/ + README (README-only change, no release needed); mobile test;
+      Merriam-Webster test with a real key
 
 ## Decisions made
 - Name **Dictionary Notes**, ID **dictionary-notes** (ID can never change after release).
@@ -34,6 +43,7 @@
 - Sources: Free Dictionary API default; Wiktionary backup; Merriam-Webster optional.
 - minAppVersion 1.13.0 (declarative settings); API key in SecretStorage.
 - Release workflow drafts first; publishing is a separate, deliberate step.
+- Fixes to released code always get a new version (never move a published tag).
 
 ## Open questions / blockers
 - Merriam-Webster parser tested on documented sample data only (no key yet).
