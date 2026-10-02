@@ -37,7 +37,7 @@ Requires Obsidian 1.13.0 or later.
 
 ### Manually
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/BurningBurrito/dictionary-notes/releases/latest).
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/BurningBurrito/obsidian-dictionary-notes/releases/latest).
 2. Copy them to `<your vault>/.obsidian/plugins/dictionary-notes/`.
 3. Reload Obsidian, then enable **Dictionary Notes** in **Settings → Community plugins**.
 
