@@ -1,8 +1,92 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Phase 5 — Release and community submission (submitted; 1.0.1 fixes review warnings)
+**Current phase:** Update 1.x — Idioms and Quotes: Phase 2 design proposed, **waiting for approval**
 **Last updated:** 2026-10-02
 
-## Done
+## Update: Idioms and Quotes (branch `feature/idioms-quotes`)
+
+### Done
+- [x] Checked listing status: **listed** in the community directory. `dictionary-notes` appears in
+      obsidianmd/obsidian-releases `community-plugins.json` (added by the mirror sync 72a7adf1,
+      2026-10-02 14:32 UTC, right after 1.0.1 was published), with the standard
+      "not been manually reviewed by Obsidian staff" label.
+- [x] Confirmed the update path in the official docs (obsidian-developer-docs, edited 2026-08-07):
+      "You only need to submit the initial version of your plugin" and the directory FAQ "Do I need to
+      resubmit ... for every update? No." Each new release is re-scanned automatically
+      (manifest, release assets, source code, build verification). **Review branch** in the dashboard
+      can preview-scan a branch before any release.
+- [x] Created branch `feature/idioms-quotes` from `main` (4090ad1)
+- [x] Baseline: `npm run build` and `npm run lint` pass on the branch
+- [x] Phase 1 code review: 15 source files read. Reusable as-is: `sources/http.ts`, `errors.ts`,
+      `renderTemplate`, `notes/create-note.ts` helpers, most of `SearchModal`. Word-specific: `types.ts`,
+      `sense-modal.ts`, `buildVariables`, `DEFAULT_TEMPLATE`, `createWordNote`, flat settings shape.
+- [x] Phase 1 research (all checked live or against current docs on 2026-10-02):
+  - **Idioms:** Wiktionary has 10,659 English idioms (Category:English_idioms). Search
+    (`incategory:English_idioms`) finds idioms from partial input ("spill beans", "ice"); REST
+    definitions return meanings + examples; the page's Etymology section gives origin. Free Dictionary
+    API also returns idioms and tags senses `idiomatic`, but has no search. Bundling a Wiktionary extract
+    would add about 3.5 MB to main.js (now 20 KB; measured 336 B/idiom). Research corpora (MAGPIE, EPIE,
+    PIE-English, IdiomKB) are unsuitable: sentence data, LLM-generated meanings, or unclear rights.
+    Wordnik: key per user, 100 calls/hour, free tier "nonprofit or research use".
+  - **Quotes:** Wikiquote (CC BY-SA 4.0) files quotes under Quotes / Attributed / Disputed /
+    Misattributed with citations; verified (e.g. "definition of insanity" sits under Misattributed on
+    Benjamin Franklin). Quotable is down (DNS fails, repo idle since 2024-01). API Ninjas free plan
+    forbids "data caching/storing" and commercial use. FavQs forbids storing content beyond "reasonable
+    periods". ZenQuotes free tier is random-only (search needs a paid key), gives no source/work/year,
+    site ToS "personal, non-commercial use". They Said So requires paid auth.
+  - **Limits:** Wikimedia 200 req/min with an identifying header (10/min without; docs 2026-06-03);
+    Free Dictionary API 1,000 req/hour per IP.
+
+- [x] Phase 1 approved by user (sources approved; 4 open questions answered, see Decisions)
+- [x] Phase 2 checks: ribbon state is stored as `pluginId:title` in workspace.json (renaming the icon
+      resets hidden/order once); declarative settings keys are plain strings on `plugin.settings`
+      (flat keys = no conversion); guidelines: general settings without heading, no "settings" in
+      headings, sentence case. Wikiquote keyword search ranks topic pages above person pages
+      (Einstein's page is 6th for his own quote), so credit comes from each quote's citation line;
+      Wikidata `wbgetclaims` P31 = Q5 tells whether a page is a person (~240 bytes).
+- [x] Phase 2 design written (summary below)
+
+### In progress
+- [ ] Waiting for approval of the Phase 2 design
+
+### Next
+- [ ] Phase 3: build · Phase 4: test (incl. upgrade from 1.0.1) · Phase 5: release (new GitHub release only)
+
+### Decisions made
+- Release path: **already listed**, so updates ship as a normal GitHub release. No new submission.
+- Plugin ID `dictionary-notes` stays (listed; changing it resets downloads and forces reinstalls).
+- Sources (approved): idioms from **Wiktionary** (search + meanings + origin), Free Dictionary API as
+  backup for meanings; quotes from **Wikiquote** only; no bundled datasets; no API keys needed.
+- Concept (user): the plugin builds **a dictionary of Definitions / Idioms / Quotes**. Files (manifest,
+  package.json, README, settings, templates) get updated to reflect this in Phase 3.
+- Default Definitions folder becomes **"Definitions"** (user's choice). Saved settings still win, so
+  anyone who saved settings in 1.0.x keeps "Dictionary"; untouched installs switch. No notes are moved.
+- Disputed / Misattributed / unverified quotes are **shown with a clear label** (not hidden).
+- **English only** for idioms and quotes for now; other languages later.
+- Command ID **`create-word-note` kept** (existing hotkeys keep working).
+
+### Design (proposed, pending approval)
+- Architecture: shared flow (search → choose item → name/exists check → choose detail → render →
+  create) in `src/core/`; one module per type in `src/lookups/{definitions,idioms,quotes}/`
+  implementing a `LookupType` interface; shared search window + one generic picker in `src/ui/`.
+- Settings: keep all 1.0 keys (now = Definitions); add `idiomFolder`, `idiomTemplateFile`,
+  `idiomUseFallback`, `quoteFolder`, `quoteTemplateFile`, `quoteSearchMode`. Layout: shared settings
+  without heading, then groups Definitions / Idioms / Quotes.
+- Quotes: Keyword / Author / Topic search; status labels Sourced / Attributed / Disputed /
+  Misattributed / Unsourced, shown in the picker, as an `attribution` property and a warning callout
+  (`{{attributionNote}}`); status confirmed on the author's own page after picking.
+- Note names: definitions `word`, idioms `idiom`, quotes `Author - excerpt` (~50 chars).
+- Ribbon: recommend one icon with a menu (Definition / Idiom / Quote).
+- Name stays "Dictionary Notes"; new description; commands "Create new definition/idiom/quote note".
+
+### Open questions / blockers
+- Design approval, especially: ribbon menu, renaming the definitions command, the new description,
+  and `Templates/Definition note.md` as the new template-copy name.
+
+---
+
+## Previous: 1.0.x release (complete)
+
+### Done
 - [x] Phase 1: researched reference plugin + dictionary sources; plan approved
 - [x] Phase 2: scaffold from official sample, naming rules verified, test vault + Hot Reload
 - [x] Phase 3: lookup (3 sources + fallback), definition picker, templates, note creation, error handling,
@@ -27,16 +111,9 @@
     2. README placeholder text (screenshots comment + "coming soon"). Removed; also reworded `<your vault>`.
   - Released **1.0.1** (user approved): draft verified (manifest 1.0.1, main.js identical to local build,
     attestation from tag 1.0.1 / 21588c7), published as latest; CI green incl. the new step
+  - 1.0.1 passed the automated review and was **listed** on 2026-10-02
 
-## In progress
-- [ ] User re-checks the review result for 1.0.1 in the dashboard
-
-## Next
-- [ ] Read the automated review result in the dashboard; fix any failures (new version: `npm version patch`)
-- [ ] Optional: real screenshots in docs/ + README (README-only change, no release needed); mobile test;
-      Merriam-Webster test with a real key
-
-## Decisions made
+### Decisions made
 - Name **Dictionary Notes**, ID **dictionary-notes** (ID can never change after release).
 - Repo **obsidian-dictionary-notes**, public; commits use the GitHub noreply address (repo-local config).
 - First release **1.0.0** (user's choice); versions.json lists only released versions.
@@ -45,8 +122,7 @@
 - Release workflow drafts first; publishing is a separate, deliberate step.
 - Fixes to released code always get a new version (never move a published tag).
 
-## Open questions / blockers
+### Open items carried over
 - Merriam-Webster parser tested on documented sample data only (no key yet).
 - Mobile not tested (isDesktopOnly is false; only Obsidian APIs used).
-- The dashboard may ask for details not covered in the docs (categories, screenshots, disclosures);
-  answers prepared in the Phase 5 summary.
+- Optional: real screenshots in docs/ + README.
