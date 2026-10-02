@@ -1,0 +1,175 @@
+{
+	"generatedFrom": "dictionary-notes 1.0.1 (git main, src/notes/template.ts and create-note.ts)",
+	"builtInTemplate": "---\nword: {{word}}\npart-of-speech: {{partOfSpeech}}\nphonetic: {{phonetic}}\nsynonyms: {{synonyms}}\nsource: {{source}}\ncreated: {{date}}\ntags:\n  - dictionary\n---\n**{{partOfSpeech}}** {{phonetic}}\n\n> {{definition}}\n\n{{examples}}\n\n## All definitions\n\n{{allDefinitions}}\n\n---\nSource: [{{source}}]({{sourceUrl}}), {{license}}\n",
+	"entries": {
+		"run": {
+			"word": "run",
+			"phonetic": "/ɹʌn/",
+			"audioUrl": "",
+			"etymology": "",
+			"synonyms": [
+				"dash",
+				"yes"
+			],
+			"antonyms": [
+				"walk"
+			],
+			"source": {
+				"id": "free-dictionary",
+				"name": "Free Dictionary API (Wiktionary)",
+				"url": "https://en.wiktionary.org/wiki/run",
+				"license": "CC BY-SA 4.0",
+				"licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+			},
+			"senses": [
+				{
+					"partOfSpeech": "verb",
+					"definition": "To move swiftly: \"fast\" on foot.",
+					"examples": [
+						"She ran home.",
+						"Run!"
+					],
+					"synonyms": [
+						"sprint"
+					],
+					"antonyms": [],
+					"depth": 0
+				},
+				{
+					"partOfSpeech": "verb",
+					"definition": "To flee.",
+					"examples": [],
+					"synonyms": [],
+					"antonyms": [
+						"stay"
+					],
+					"depth": 1
+				},
+				{
+					"partOfSpeech": "noun",
+					"definition": "An act of running.",
+					"examples": [],
+					"synonyms": [],
+					"antonyms": [],
+					"depth": 0
+				}
+			]
+		},
+		"colour": {
+			"word": "colour",
+			"phonetic": "\\ˈkə-lər\\",
+			"audioUrl": "https://media.merriam-webster.com/audio/prons/en/us/mp3/c/color01.mp3",
+			"etymology": "Middle English colour, from Anglo-French",
+			"synonyms": [],
+			"antonyms": [],
+			"source": {
+				"id": "merriam-webster",
+				"name": "Merriam-Webster's Collegiate Dictionary",
+				"url": "https://www.merriam-webster.com/dictionary/colour",
+				"license": "© Merriam-Webster, Inc.",
+				"licenseUrl": "https://dictionaryapi.com/info/terms-of-service"
+			},
+			"senses": [
+				{
+					"partOfSpeech": "noun",
+					"definition": "a phenomenon of light; null: yes",
+					"examples": [
+						"'tis red"
+					],
+					"synonyms": [],
+					"antonyms": [],
+					"depth": 0
+				}
+			]
+		}
+	},
+	"customTemplate": "---\ndef: {{definition}}\nsyn: {{synonyms}}\nant:\n  - {{antonyms}}\nd: {{date:YYYY}}\n---\n# {{word}} {{unknown}}\n{{time}} {{date:dddd}}\n{{allDefinitions}}\n{{etymology}} {{audio}} {{example}}",
+	"cases": [
+		{
+			"name": "run sense 0 built-in",
+			"entry": "run",
+			"sense": 0,
+			"template": null,
+			"expected": "---\nword: run\npart-of-speech: verb\nphonetic: \"/ɹʌn/\"\nsynonyms: [\"sprint\"]\nsource: \"Free Dictionary API (Wiktionary)\"\ncreated: \"<YYYY-MM-DD>\"\ntags:\n  - dictionary\n---\n**verb** /ɹʌn/\n\n> To move swiftly: \"fast\" on foot.\n\n- *She ran home.*\n- *Run!*\n\n## All definitions\n\n**verb**\n\n1. To move swiftly: \"fast\" on foot.\n\t- To flee.\n\n**noun**\n\n1. An act of running.\n\n---\nSource: [Free Dictionary API (Wiktionary)](https://en.wiktionary.org/wiki/run), CC BY-SA 4.0\n"
+		},
+		{
+			"name": "run sense 0 custom",
+			"entry": "run",
+			"sense": 0,
+			"template": "---\ndef: {{definition}}\nsyn: {{synonyms}}\nant:\n  - {{antonyms}}\nd: {{date:YYYY}}\n---\n# {{word}} {{unknown}}\n{{time}} {{date:dddd}}\n{{allDefinitions}}\n{{etymology}} {{audio}} {{example}}",
+			"expected": "---\ndef: \"To move swiftly: \\\"fast\\\" on foot.\"\nsyn: [\"sprint\"]\nant:\n  - [\"walk\"]\nd: \"<YYYY>\"\n---\n# run {{unknown}}\n<HH:mm> <dddd>\n**verb**\n\n1. To move swiftly: \"fast\" on foot.\n\t- To flee.\n\n**noun**\n\n1. An act of running.\n  She ran home."
+		},
+		{
+			"name": "run sense 1 built-in",
+			"entry": "run",
+			"sense": 1,
+			"template": null,
+			"expected": "---\nword: run\npart-of-speech: verb\nphonetic: \"/ɹʌn/\"\nsynonyms: [\"dash\",\"yes\"]\nsource: \"Free Dictionary API (Wiktionary)\"\ncreated: \"<YYYY-MM-DD>\"\ntags:\n  - dictionary\n---\n**verb** /ɹʌn/\n\n> To flee.\n\n\n\n## All definitions\n\n**verb**\n\n1. To move swiftly: \"fast\" on foot.\n\t- To flee.\n\n**noun**\n\n1. An act of running.\n\n---\nSource: [Free Dictionary API (Wiktionary)](https://en.wiktionary.org/wiki/run), CC BY-SA 4.0\n"
+		},
+		{
+			"name": "run sense 1 custom",
+			"entry": "run",
+			"sense": 1,
+			"template": "---\ndef: {{definition}}\nsyn: {{synonyms}}\nant:\n  - {{antonyms}}\nd: {{date:YYYY}}\n---\n# {{word}} {{unknown}}\n{{time}} {{date:dddd}}\n{{allDefinitions}}\n{{etymology}} {{audio}} {{example}}",
+			"expected": "---\ndef: \"To flee.\"\nsyn: [\"dash\",\"yes\"]\nant:\n  - [\"stay\"]\nd: \"<YYYY>\"\n---\n# run {{unknown}}\n<HH:mm> <dddd>\n**verb**\n\n1. To move swiftly: \"fast\" on foot.\n\t- To flee.\n\n**noun**\n\n1. An act of running.\n  "
+		},
+		{
+			"name": "run sense 2 built-in",
+			"entry": "run",
+			"sense": 2,
+			"template": null,
+			"expected": "---\nword: run\npart-of-speech: noun\nphonetic: \"/ɹʌn/\"\nsynonyms: [\"dash\",\"yes\"]\nsource: \"Free Dictionary API (Wiktionary)\"\ncreated: \"<YYYY-MM-DD>\"\ntags:\n  - dictionary\n---\n**noun** /ɹʌn/\n\n> An act of running.\n\n\n\n## All definitions\n\n**verb**\n\n1. To move swiftly: \"fast\" on foot.\n\t- To flee.\n\n**noun**\n\n1. An act of running.\n\n---\nSource: [Free Dictionary API (Wiktionary)](https://en.wiktionary.org/wiki/run), CC BY-SA 4.0\n"
+		},
+		{
+			"name": "run sense 2 custom",
+			"entry": "run",
+			"sense": 2,
+			"template": "---\ndef: {{definition}}\nsyn: {{synonyms}}\nant:\n  - {{antonyms}}\nd: {{date:YYYY}}\n---\n# {{word}} {{unknown}}\n{{time}} {{date:dddd}}\n{{allDefinitions}}\n{{etymology}} {{audio}} {{example}}",
+			"expected": "---\ndef: \"An act of running.\"\nsyn: [\"dash\",\"yes\"]\nant:\n  - [\"walk\"]\nd: \"<YYYY>\"\n---\n# run {{unknown}}\n<HH:mm> <dddd>\n**verb**\n\n1. To move swiftly: \"fast\" on foot.\n\t- To flee.\n\n**noun**\n\n1. An act of running.\n  "
+		},
+		{
+			"name": "colour sense 0 built-in",
+			"entry": "colour",
+			"sense": 0,
+			"template": null,
+			"expected": "---\nword: colour\npart-of-speech: noun\nphonetic: \"\\\\ˈkə-lər\\\\\"\nsynonyms:\nsource: \"Merriam-Webster's Collegiate Dictionary\"\ncreated: \"<YYYY-MM-DD>\"\ntags:\n  - dictionary\n---\n**noun** \\ˈkə-lər\\\n\n> a phenomenon of light; null: yes\n\n- *'tis red*\n\n## All definitions\n\n**noun**\n\n1. a phenomenon of light; null: yes\n\n---\nSource: [Merriam-Webster's Collegiate Dictionary](https://www.merriam-webster.com/dictionary/colour), © Merriam-Webster, Inc.\n"
+		},
+		{
+			"name": "colour sense 0 custom",
+			"entry": "colour",
+			"sense": 0,
+			"template": "---\ndef: {{definition}}\nsyn: {{synonyms}}\nant:\n  - {{antonyms}}\nd: {{date:YYYY}}\n---\n# {{word}} {{unknown}}\n{{time}} {{date:dddd}}\n{{allDefinitions}}\n{{etymology}} {{audio}} {{example}}",
+			"expected": "---\ndef: \"a phenomenon of light; null: yes\"\nsyn:\nant:\n  -\nd: \"<YYYY>\"\n---\n# colour {{unknown}}\n<HH:mm> <dddd>\n**noun**\n\n1. a phenomenon of light; null: yes\nMiddle English colour, from Anglo-French https://media.merriam-webster.com/audio/prons/en/us/mp3/c/color01.mp3 'tis red"
+		}
+	],
+	"names": [
+		{
+			"input": "run",
+			"expected": "run"
+		},
+		{
+			"input": "AC/DC",
+			"expected": "AC DC"
+		},
+		{
+			"input": "...dots",
+			"expected": "dots"
+		},
+		{
+			"input": "a:b|c#d^e[f]",
+			"expected": "a b c d e f"
+		},
+		{
+			"input": "",
+			"expected": "Untitled word"
+		},
+		{
+			"input": "  spaced   out  ",
+			"expected": "spaced out"
+		},
+		{
+			"input": "naïve café",
+			"expected": "naïve café"
+		}
+	]
+}
