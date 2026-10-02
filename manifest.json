@@ -3,7 +3,7 @@
 	"name": "Dictionary Notes",
 	"version": "1.0.1",
 	"minAppVersion": "1.13.0",
-	"description": "Look up a word in a dictionary and create a note from its definition using your own template.",
+	"description": "Build a dictionary in your vault: look up definitions, idioms, and quotes, and save each one as a note using your own templates.",
 	"author": "BurningBurrito",
 	"authorUrl": "https://github.com/BurningBurrito",
 	"isDesktopOnly": false
