@@ -7,6 +7,8 @@ export default defineConfig(
 		'node_modules',
 		'dist',
 		'test-vault',
+		'test-vault-upgrade',
+		'tests',
 		'esbuild.config.mjs',
 		'version-bump.mjs',
 		'versions.json',
