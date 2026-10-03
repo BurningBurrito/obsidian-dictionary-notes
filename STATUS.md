@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update 1.x — Idioms and Quotes: Phase 5 (release) prepared, **waiting for approval**
+**Current phase:** Update 1.x — Idioms and Quotes: **1.1.0 released**; remaining: dashboard follow-up (user)
 **Last updated:** 2026-10-02
 
 ## Update: Idioms and Quotes (branch `feature/idioms-quotes`)
@@ -109,19 +109,28 @@
     and 24 (run 37081288407); local main.js sha256 a0ec3f6d… (40,336 bytes) for comparing with the draft
   - Release notes drafted (shown to the user)
 
-### In progress
-- [ ] Waiting for the user: Review branch scan result on `feature/idioms-quotes` (asked three times; if
-      skipped, the release relies on local and CI lint with the same official rules)
-- [ ] Waiting for the user: screenshots question (README placeholders caused a 1.0.0 review warning)
-- [ ] Waiting for approval to release (steps below)
+- [x] User answers: Review branch scan of `feature/idioms-quotes` showed **no warnings**; no screenshots
+      for now (README placeholders caused a 1.0.0 warning; add real ones later, README-only change);
+      release approved ("move to next phase")
+- [x] **Released 1.1.0**:
+  - Annotated tag `1.1.0` on 8c08d4f "Release 1.1.0", pushed; release workflow run 37081883370 passed
+    (tag check, build, attestation, draft)
+  - Draft verified before publishing: 3 assets; manifest 1.1.0 / minAppVersion 1.13.0 / new description;
+    main.js (40,336 bytes) and styles.css byte-identical to the local build; manifest identical to the
+    tagged commit; attestation verified (release.yml @ refs/tags/1.1.0, commit 8c08d4f)
+  - Published 2026-10-03 00:24 UTC with the release notes, marked latest; public downloads return 200
+  - `main` fast-forwarded to the feature branch (this status commit) and pushed, after the release was
+    live, so users are only offered 1.1.0 once its files exist
 
-### Next (each public step needs approval)
-- [ ] Push tag `1.1.0` → release workflow builds a draft (not visible to users)
-- [ ] Verify draft: 3 assets, manifest 1.1.0, main.js identical to local build, attestation from tag 1.1.0
-- [ ] Publish the release with the notes
-- [ ] Fast-forward `main` to the release commit and push (users are offered the update from here)
-- [ ] Dashboard: Check for new releases, read the scan, Edit listing (new description, screenshots)
-- [ ] Optional: delete the feature branch on GitHub after the merge
+### In progress
+- [ ] User, on community.obsidian.md: **Check for new releases**, read the scan result for 1.1.0, then
+      **Edit listing**: paste the new description ("Build a dictionary in your vault: look up definitions,
+      idioms, and quotes, and save each one as a note using your own templates.")
+
+### Next
+- [ ] Optional: delete the merged `feature/idioms-quotes` branch on GitHub
+- [ ] Later: screenshots (README in `docs/` or dashboard listing, 1200×800), mobile test, Merriam-Webster
+      test with a real key, the "ice cream" source-link fix for Definitions, work-page authors via Wikidata
 
 ### Decisions made
 - Release path: **already listed**, so updates ship as a normal GitHub release. No new submission.
