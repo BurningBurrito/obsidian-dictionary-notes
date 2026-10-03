@@ -122,14 +122,18 @@
   - `main` fast-forwarded to the feature branch (this status commit) and pushed, after the release was
     live, so users are only offered 1.1.0 once its files exist
 
+- [x] Deleted the merged `feature/idioms-quotes` branch on GitHub (user approved; it pointed at main's
+      commit bcccdad with no extra commits and no open PRs). Local copy kept
+- [x] Wrote the listing's long description (plain text; shown on the listing's Overview tab and sidebar,
+      above the README excerpt, so it doesn't repeat the README)
+
 ### In progress
 - [ ] User, on community.obsidian.md: **Check for new releases**, read the scan result for 1.1.0, then
-      **Edit listing**: paste the new description ("Build a dictionary in your vault: look up definitions,
-      idioms, and quotes, and save each one as a note using your own templates.")
+      **Edit listing**: paste the short description ("Build a dictionary in your vault: look up definitions,
+      idioms, and quotes, and save each one as a note using your own templates.") and the long description
 
 ### Next
-- [ ] Optional: delete the merged `feature/idioms-quotes` branch on GitHub
-- [ ] Later: screenshots (README in `docs/` or dashboard listing, 1200×800), mobile test, Merriam-Webster
+- [ ] Later (user: leave for later): screenshots (README in `docs/` or dashboard listing, 1200×800), mobile test, Merriam-Webster
       test with a real key, the "ice cream" source-link fix for Definitions, work-page authors via Wikidata
 
 ### Decisions made
