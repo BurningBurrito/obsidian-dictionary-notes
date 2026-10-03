@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update 1.x — Idioms and Quotes: Phase 4 (test) in progress
+**Current phase:** Update 1.x — Idioms and Quotes: Phase 5 (release) prepared, **waiting for approval**
 **Last updated:** 2026-10-02
 
 ## Update: Idioms and Quotes (branch `feature/idioms-quotes`)
@@ -83,14 +83,45 @@
 - [x] Noticed `.obsidian/` in the project root (created 19:39, default config only, likely from opening
       the project folder as a vault). Left in place; added `/.obsidian/` to .gitignore
 
-### In progress
-- [ ] User: upgrade test in `test-vault-upgrade/` (configure 1.0.1, upgrade, check carry-over), then I
-      compare data.json before/after and hotkeys.json
-- [ ] User: dashboard **Review branch** scan of `feature/idioms-quotes`; I fix anything it reports
-- [ ] User: manual UI checks in `test-vault/` (search modes, labels, settings layout, ribbon menu, offline)
+- [x] User reported all tests passed. Files confirm the manual UI checks in `test-vault/` (new version,
+      19:42–19:45: Definitions/fag.md, Idioms/give me a break.md, a quote note from a topic search;
+      settings saved with all new keys, quoteSearchMode remembered as "topic")
 
-### Next
-- [ ] Phase 5: version bump (recommend 1.1.0), release notes, merge (user approval), GitHub release
+### In progress
+- [x] Upgrade test, **untouched-settings path** (user, 20:03–20:07): vault opened, new build installed
+      (main.js identical to the current build), definition/idiom/quote notes created; settings were
+      all defaults, so new definition notes went to `Definitions/` as designed
+- [x] Upgrade test, **customized path**: user reran the test; files show the only change was the plugin
+      being turned off at 20:11 (no snapshot, default settings, no hotkeys.json, no template or
+      My Words note), so it was not exercised in Obsidian. User chose to continue to Phase 5; this case
+      relies on the automated tests on exact 1.0.1 data (settings.test, flow.test "keeps using the
+      folder and template from 1.0.1"). Command ID unchanged, so hotkeys map as before
+- [x] **Phase 4 closed** (user: "all tests passed"; continue to Phase 5)
+- [x] Phase 5 prep:
+  - Release docs rechecked: unchanged since 2026-08-07 (no resubmission; new GitHub release = update;
+    each release re-scanned). Obsidian reads manifest.json/versions.json from the default branch and
+    downloads assets from the release whose tag matches, so **publish the release before pushing main**
+  - minAppVersion 1.13.0 still right: the only APIs marked 1.13.1 that matched were name collisions
+    (group search, settings pages, DisplayValueComponent: none used)
+  - Version **1.1.0** (minor: new features, nothing breaks): commit 8c08d4f "Release 1.1.0"
+    (manifest, package, package-lock, versions.json "1.1.0": "1.13.0"); no tag yet
+  - Release candidate checks: build, lint, lint without moment types, 77/77 tests; CI green on Node 22
+    and 24 (run 37081288407); local main.js sha256 a0ec3f6d… (40,336 bytes) for comparing with the draft
+  - Release notes drafted (shown to the user)
+
+### In progress
+- [ ] Waiting for the user: Review branch scan result on `feature/idioms-quotes` (asked three times; if
+      skipped, the release relies on local and CI lint with the same official rules)
+- [ ] Waiting for the user: screenshots question (README placeholders caused a 1.0.0 review warning)
+- [ ] Waiting for approval to release (steps below)
+
+### Next (each public step needs approval)
+- [ ] Push tag `1.1.0` → release workflow builds a draft (not visible to users)
+- [ ] Verify draft: 3 assets, manifest 1.1.0, main.js identical to local build, attestation from tag 1.1.0
+- [ ] Publish the release with the notes
+- [ ] Fast-forward `main` to the release commit and push (users are offered the update from here)
+- [ ] Dashboard: Check for new releases, read the scan, Edit listing (new description, screenshots)
+- [ ] Optional: delete the feature branch on GitHub after the merge
 
 ### Decisions made
 - Release path: **already listed**, so updates ship as a normal GitHub release. No new submission.
@@ -104,6 +135,10 @@
 - Disputed / Misattributed / unverified quotes are **shown with a clear label** (not hidden).
 - **English only** for idioms and quotes for now; other languages later.
 - Command ID **`create-word-note` kept** (existing hotkeys keep working).
+- Version **1.1.0** (minor): new features, nothing breaks for existing users.
+- Release order (plugin is listed): tag → draft → verify → publish → then push `main`, so users are
+  never offered a version whose release files don't exist yet.
+- No placeholder text in the README (it caused a 1.0.0 review warning); screenshots pending user choice.
 
 - Build details (Phase 3): plain search ranks idioms best (finds related idioms too); exact title match
   skips the list. Author search accepts **people only** (Wikidata Q5), so a topic like "Love" is never
@@ -130,6 +165,9 @@
   existed before; Obsidian provides moment at runtime). `npm audit fix --force` would downgrade the
   Obsidian API to 0.14.5, so not applied.
 - Not testable here: mobile (isDesktopOnly false; only Obsidian APIs and DOMParser used).
+- Possible later improvement (seen in manual test): topic search on a work's page (e.g. "Dune") gives
+  author "Unknown" because those pages credit characters, not the writer. Wikidata could supply the
+  work's author (P50) and set {{work}} to the page title. Not in scope for this release.
 - Found while testing (not changed, Definitions must stay identical without approval): the 1.0
   Free Dictionary API source uses the API's unencoded URL, so a multi-word definition lookup
   ("ice cream") gets a source link with raw spaces that breaks the Markdown link. Fixed for idioms.
