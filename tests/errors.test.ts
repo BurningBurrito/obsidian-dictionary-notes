@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
 import { httpGet, parseJson } from '../src/core/http';
+import { definitions } from '../src/lookups/definitions';
 import { idioms } from '../src/lookups/idioms';
 import { findByKeyword } from '../src/lookups/quotes/search';
 import type DictionaryNotesPlugin from '../src/main';
@@ -102,5 +103,21 @@ describe('errors from the idiom and quote sources', () => {
 		setOnline(false);
 		await assert.rejects(findByKeyword('courage'), { kind: 'offline' });
 		await assert.rejects(idioms.find('break the ice', plugin, undefined), { kind: 'offline' });
+	});
+
+	it('Wikcionario rate limit, with the backup turned off', async () => {
+		const noBackup = { settings: sanitizeSettings({ useFallback: false }), getApiKey: () => '' } as unknown as DictionaryNotesPlugin;
+		fake('es.wiktionary.org', status(429, { 'retry-after': '120' }));
+		await assert.rejects(definitions.find('canción', noBackup, 'es'), {
+			kind: 'rate-limited',
+			message: 'Wikcionario has received too many requests. Try again in 2 minutes.',
+		});
+	});
+
+	it('offline in both Spanish modes (no backup attempt)', async () => {
+		const spanish = { settings: sanitizeSettings(null), getApiKey: () => '' } as unknown as DictionaryNotesPlugin;
+		setOnline(false);
+		await assert.rejects(definitions.find('canción', spanish, 'es'), { kind: 'offline' });
+		await assert.rejects(definitions.find('sin', spanish, 'es-en'), { kind: 'offline' });
 	});
 });
