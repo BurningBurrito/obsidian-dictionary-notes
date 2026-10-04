@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update — Spanish definitions: Phase 1 done, **waiting for approval**
+**Current phase:** Update — Spanish definitions: Phase 2 design proposed, **waiting for approval**
 **Last updated:** 2026-10-03
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
@@ -34,19 +34,40 @@ approval), 3 build, 4 test, 5 release.
 - [x] Phase 1 — interface language: Obsidian's `getLanguage()` (since 1.8.7) makes a Spanish UI possible;
       separate from Spanish definitions
 
+- [x] Phase 1 approved: **(a) both, chosen per lookup** (definitions written in Spanish, or Spanish words
+      explained in English). Plugin interface in Spanish → future release
+- [x] Phase 2 checks: Wikcionario full-text search forgives missing accents (cancion → canción,
+      corazon → corazón; prefix search doesn't); definitions are dt/dd with labeled sub-items
+      (**Sinónimos:**, **Antónimo:**, **Ejemplo:**); pronunciation in an AFI line ([koˈreɾ]); verb forms
+      are marked (Wikcionario `definicion-impropia`, English Wiktionary `form-of-definition`) and end with
+      a link to the base word
+- [x] Phase 2 design written (summary below)
+
 ### In progress
-- [ ] Waiting for the user: which Spanish definitions (in Spanish, in English, or both) + approval
+- [ ] Waiting for approval of the Phase 2 design
 
 ### Next
-- [ ] Phase 2: design, **wait for approval**
 - [ ] Phase 3: build · Phase 4: test · Phase 5: release (GitHub release; the plugin is listed)
 
 ### Decisions made
-- (pending approval) Recommended: both kinds for Spanish words, chosen per lookup; Wikcionario as the new
-  source for Spanish-language definitions; keep English-explained Spanish from the current sources.
+- Both kinds of Spanish definitions, chosen per lookup (user). Wikcionario (es.wiktionary.org) is the new
+  source for definitions written in Spanish; Free Dictionary API / English Wiktionary for Spanish words
+  explained in English.
+- Future release (user): Spanish idioms, Spanish quotes, plugin interface in Spanish.
+
+### Design (proposed, pending approval)
+- Search window modes for definitions: **English** (main language from the Language setting, unchanged
+  behavior) · **Español** (Wikcionario) · **Spanish → English**; last used remembered; a setting hides
+  the buttons. If the main language is already `es`, the duplicate button is hidden.
+- Folder follows the word's language (Spanish words → new Spanish folder, default `Definitions/Español`);
+  template follows the explanation language (written in Spanish → new built-in Spanish template).
+- New `{{language}}` variable; source links open the Spanish section; Free Dictionary API links encoded
+  (fixes the "ice cream" bug, also for English phrases); accent-forgiving "Did you mean" for Spanish;
+  verb forms offer the base word.
+- New settings keys only (nothing renamed); version 1.2.0; es.wiktionary.org added to network disclosure.
 
 ### Open questions / blockers
-- What "definitions support Spanish" should mean: definitions written in Spanish, in English, or both.
+- Design approval (see the choices listed in the Phase 2 summary).
 
 ---
 
