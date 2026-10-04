@@ -66,6 +66,31 @@ describe('settings migration', () => {
 		assert.equal(s.quoteSearchMode, 'keyword');
 	});
 
+	it('a 1.1.0 setup carries over, and the Spanish settings get defaults', () => {
+		const saved = {
+			...SAVED_BY_1_0_1,
+			idiomFolder: 'My idioms',
+			idiomTemplateFile: 'Templates/Idiom note.md',
+			idiomUseFallback: false,
+			quoteFolder: 'My quotes',
+			quoteTemplateFile: '',
+			quoteSearchMode: 'author',
+		};
+		const s = sanitizeSettings({ ...saved });
+		for (const [key, value] of Object.entries(saved)) {
+			assert.equal(s[key as keyof typeof s], value, `${key} should carry over`);
+		}
+		assert.equal(s.spanishEnabled, true);
+		assert.equal(s.spanishFolder, 'Definitions/Español');
+		assert.equal(s.spanishTemplateFile, '');
+		assert.equal(s.definitionSearchMode, 'main');
+	});
+
+	it('repairs an unknown definitions search mode', () => {
+		assert.equal(sanitizeSettings({ definitionSearchMode: 'klingon' }).definitionSearchMode, 'main');
+		assert.equal(sanitizeSettings({ definitionSearchMode: 'es-en' }).definitionSearchMode, 'es-en');
+	});
+
 	it('keeps a remembered quote search mode', () => {
 		assert.equal(sanitizeSettings({ quoteSearchMode: 'author' }).quoteSearchMode, 'author');
 	});

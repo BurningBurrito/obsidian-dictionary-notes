@@ -151,3 +151,58 @@ describe('quote notes', () => {
 		assert.match(note, /\ntopics: \["courage","pride","soul","stoicism"\]\n/);
 	});
 });
+
+describe('Spanish definition notes', () => {
+	it('creates a note written in Spanish in the Spanish folder, from the Spanish template', async () => {
+		const { plugin, vault } = fakePlugin();
+		script.mode = 'es';
+		script.query = 'canción';
+		await createDictionaryNote(plugin, definitions);
+		const note = vault.files.get('Definitions/Español/canción.md') ?? '';
+		assert.match(note, /^---\nword: canción\nlanguage: es\npart-of-speech: sustantivo femenino\nphonetic: "\[kãnˈsjõn\]"\n/);
+		assert.match(note, /## Etimología\n\nSemicultismo del latín cantiō\./);
+		assert.match(note, /Fuente: \[Wikcionario\]\(https:\/\/es\.wiktionary\.org\/wiki\/canci%C3%B3n#Espa%C3%B1ol\), CC BY-SA 4\.0/);
+	});
+
+	it('keeps English and Spanish notes for the same spelling apart', async () => {
+		const { plugin, vault } = fakePlugin(null, { 'Definitions/sin.md': 'English sin' }, ['Definitions']);
+		script.mode = 'es-en';
+		script.query = 'sin';
+		await createDictionaryNote(plugin, definitions);
+		assert.equal(vault.files.get('Definitions/sin.md'), 'English sin');
+		assert.match(vault.files.get('Definitions/Español/sin.md') ?? '', /^---\nword: sin\n/);
+	});
+
+	it('starts in the remembered mode', async () => {
+		const { plugin, vault } = fakePlugin({ definitionSearchMode: 'es' });
+		script.query = 'canción';
+		await createDictionaryNote(plugin, definitions);
+		assert.equal(ui.searches[0]?.initialMode, 'es');
+		assert.ok(vault.files.has('Definitions/Español/canción.md'));
+	});
+
+	it('shows no buttons when Spanish is turned off', async () => {
+		const { plugin } = fakePlugin({ spanishEnabled: false });
+		script.query = 'run';
+		await createDictionaryNote(plugin, definitions);
+		assert.equal(ui.searches[0]?.modes, undefined);
+	});
+
+	it('offers the base word of a form, and looks it up when chosen', async () => {
+		const { plugin, vault } = fakePlugin();
+		script.mode = 'es';
+		script.query = 'corrí';
+		script.review = 'alternative';
+		await createDictionaryNote(plugin, definitions);
+		assert.equal(ui.reviews[0]?.message, '"corrí" is a form of "correr".');
+		assert.ok(vault.files.has('Definitions/Español/correr.md'));
+	});
+
+	it('keeps the form when the user chooses to', async () => {
+		const { plugin, vault } = fakePlugin();
+		script.mode = 'es';
+		script.query = 'corrí';
+		await createDictionaryNote(plugin, definitions);
+		assert.ok(vault.files.has('Definitions/Español/corrí.md'));
+	});
+});

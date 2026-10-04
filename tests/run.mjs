@@ -2,19 +2,22 @@
 // stand-ins for Obsidian and the UI (tests/support/), then runs the bundles
 // with Node's built-in test runner.
 //
-//   npm test              answer requests from recorded responses (no network)
-//   npm run test:record   make the real requests and save new recordings
+//   npm test                       answer requests from recorded responses (no network)
+//   npm run test:record            make the real requests and save new recordings
+//   npm run test:record -- spanish   ...only for the named suites (tests/spanish.test.ts)
 import esbuild from 'esbuild';
 import { spawnSync } from 'node:child_process';
 import { readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
 const record = process.argv.includes('--record');
+const only = process.argv.slice(2).filter((arg) => !arg.startsWith('--'));
 const outdir = 'tests/.build';
 rmSync(outdir, { recursive: true, force: true });
 
 const entryPoints = readdirSync('tests')
 	.filter((file) => file.endsWith('.test.ts'))
+	.filter((file) => only.length === 0 || only.includes(file.replace(/\.test\.ts$/, '')))
 	.map((file) => `tests/${file}`);
 const uiStandIn = path.resolve('tests/support/ui.ts');
 
