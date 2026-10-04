@@ -99,6 +99,12 @@ approval), 3 build, 4 test, 5 release.
 - [x] Dashboard follow-up done (user: "everything else is completed")
 - [x] Deleted the merged `feature/spanish-definitions` branch on GitHub (user approved; it pointed at
       main's commit c4eb66a with no extra commits and no open PRs). Local copy kept
+- [x] Portfolio card on tonyherrera.org updated for 1.1.0 and 1.2.0 (user, 2026-10-04): definitions,
+      idioms, and quotes; Spanish from Wikcionario or explained in English; 103 offline tests; sample
+      note `canción` taken from the recorded Wikcionario response. Live (TonyHerreraWebsite e95b19d)
+- [x] Secret scan (user, 2026-10-04): gitleaks 8.30.1 (checksum verified) on the full history (34
+      commits) and working tree, **no findings**; recorded fixtures (`tests/fixtures/http/*.gz`)
+      checked by hand: no API keys or tokens, and no Merriam-Webster requests recorded
 
 ### Next
 - [ ] Future release (user): Spanish idioms, Spanish quotes (English Wikiquote originals; optionally
