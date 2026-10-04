@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update — Spanish definitions: **1.2.0 released**; remaining: dashboard follow-up (user)
+**Current phase:** Update — Spanish definitions: **1.2.0 released and complete**
 **Last updated:** 2026-10-04
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
@@ -96,12 +96,11 @@ approval), 3 build, 4 test, 5 release.
   - Published 2026-10-04 04:17 UTC with the release notes, marked latest; public downloads return 200
   - `main` fast-forwarded to the feature branch (this status commit) and pushed after the release was live
 
-### In progress
-- [ ] User, on community.obsidian.md: **Check for new releases**; optionally add Spanish to the long
-      description
+- [x] Dashboard follow-up done (user: "everything else is completed")
+- [x] Deleted the merged `feature/spanish-definitions` branch on GitHub (user approved; it pointed at
+      main's commit c4eb66a with no extra commits and no open PRs). Local copy kept
 
 ### Next
-- [ ] Optional: delete `feature/spanish-definitions` on GitHub
 - [ ] Future release (user): Spanish idioms, Spanish quotes (English Wikiquote originals; optionally
       es.wikiquote), plugin interface in Spanish (`getLanguage()`), Merriam-Webster Spanish-English
 - [ ] Carried over from 1.1.0: screenshots, mobile test, Merriam-Webster test with a real key,
