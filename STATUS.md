@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update — Spanish definitions: Phase 3 (build) done; next Phase 4 (test)
+**Current phase:** Update — Spanish definitions: Phase 4 (test) done except the Review branch scan (user)
 **Last updated:** 2026-10-03
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
@@ -62,8 +62,21 @@ approval), 3 build, 4 test, 5 release.
     templates verified identical to the code; no placeholder text
   - build, lint, lint without moment types: clean; main.js 49,028 bytes (was 40,336)
 
+- [x] Phase 3 approved by user ("the design works great"); user approved pushing the feature branch
+- [x] Phase 4 manual test (user, test-vault, 23:06–23:08), confirmed from the files: Español notes from
+      Wikcionario with the Spanish template (canción, sin); Spanish → English note from Free Dictionary API
+      with the Definitions template (crear); English "Sin" kept apart in `Definitions/`; the user's custom
+      Spanish folder (`Dictionary/Spanish`) respected; upgrade from 1.1.0 settings in the real app: 1.1.0
+      values kept (quoteSearchMode "topic"), new keys added, remembered button saved (es-en)
+- [x] Phase 4 automated: **103 tests, all pass** (added Wikcionario 429 message with backup off, both
+      Spanish modes offline). Deliberate breakage of the new code: folder rule, separate example lists,
+      base-word offer, old Free Dictionary API links, unfiltered suggestions: all caught (the suggestions
+      test was strengthened to an exact list after the first try slipped through)
+- [x] Pushed `feature/spanish-definitions` (user approved; main untouched, no tags). CI green on Node 22
+      and 24 (run 37173431482, commit c17b61e)
+
 ### In progress
-- [ ] Phase 4: test (user in test vault; ask before pushing the branch for CI and the Review branch scan)
+- [ ] User: dashboard **Review branch** scan of `feature/spanish-definitions`
 
 ### Next
 - [ ] Phase 3: build · Phase 4: test · Phase 5: release (GitHub release; the plugin is listed)
@@ -86,7 +99,7 @@ approval), 3 build, 4 test, 5 release.
 - New settings keys only (nothing renamed); version 1.2.0; es.wiktionary.org added to network disclosure.
 
 ### Open questions / blockers
-- Pushing `feature/spanish-definitions` (for CI and the dashboard's Review branch scan) needs approval.
+- Review branch scan result (needed before tagging 1.2.0).
 
 ---
 
