@@ -24,10 +24,12 @@ export async function createDictionaryNote<Found, Item, Detail>(
 	const { app, settings } = plugin;
 	const modeKey = type.searchModeKey;
 
-	const found = await openSearchModal(
+	const found = await openSearchModal<Found>(
 		app,
 		{
 			...type.search,
+			modes: type.searchModes ? type.searchModes(settings) : type.search.modes,
+			review: type.review ? (result) => type.review?.(result) : undefined,
 			initialQuery: selectedText(plugin),
 			initialMode: modeKey ? settings[modeKey] : undefined,
 			onModeChange: modeKey
@@ -47,7 +49,12 @@ export async function createDictionaryNote<Found, Item, Detail>(
 	const item = await showFailure(() => type.chooseItem(app, found));
 	if (item === null) return;
 
-	const folder = normalizeFolder(settings[type.settingKeys.folder]);
+	const target = type.target?.(item, settings) ?? {
+		folder: settings[type.settingKeys.folder],
+		templateFile: settings[type.settingKeys.templateFile],
+		builtInTemplate: type.defaultTemplate,
+	};
+	const folder = normalizeFolder(target.folder);
 	const baseName = type.noteName(item);
 	const existing = app.vault.getFileByPath(notePath(folder, baseName));
 	if (existing && settings.ifNoteExists === 'open') {
@@ -59,10 +66,9 @@ export async function createDictionaryNote<Found, Item, Detail>(
 	const detail = await showFailure(() => type.chooseDetail(app, item));
 	if (detail === null) return;
 
-	const templateFile = settings[type.settingKeys.templateFile];
-	const { template, missing } = await loadTemplate(app, templateFile, type.defaultTemplate);
+	const { template, missing } = await loadTemplate(app, target.templateFile, target.builtInTemplate);
 	if (missing) {
-		new Notice(`Template "${templateFile}" was not found, so the built-in template was used.`);
+		new Notice(`Template "${target.templateFile}" was not found, so the built-in template was used.`);
 	}
 	const content = renderTemplate(template, type.variables(item, detail));
 

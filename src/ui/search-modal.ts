@@ -9,7 +9,16 @@ export interface SearchMode {
 	placeholder: string;
 }
 
-export interface SearchOptions {
+/** A question to ask before closing, e.g. "corrí" is a form of "correr". */
+export interface SearchReview {
+	message: string;
+	/** Other searches to offer, such as the base word. */
+	alternatives: string[];
+	/** Button text for keeping the result as it is. */
+	keepLabel: string;
+}
+
+export interface SearchOptions<T = unknown> {
 	title: string;
 	placeholder: string;
 	/** Shown when the user searches with an empty box. */
@@ -19,6 +28,8 @@ export interface SearchOptions {
 	modes?: SearchMode[];
 	initialMode?: string;
 	onModeChange?: (mode: string) => void;
+	/** Check a result before closing; return a question to ask, or undefined to close. */
+	review?: (result: T) => SearchReview | undefined;
 }
 
 type Lookup<T> = (query: string, mode: string | undefined) => Promise<T>;
@@ -26,7 +37,7 @@ type Lookup<T> = (query: string, mode: string | undefined) => Promise<T>;
 /** Ask for a search term and look it up. Resolves with null if the user cancels. */
 export function openSearchModal<T>(
 	app: App,
-	options: SearchOptions,
+	options: SearchOptions<T>,
 	lookup: Lookup<T>,
 ): Promise<T | null> {
 	return new Promise((resolve) => {
@@ -37,8 +48,10 @@ export function openSearchModal<T>(
 // Errors are shown inside the modal (instead of closing it) so the user can
 // fix a typo or retry without starting over.
 class SearchModal<T> extends Modal {
-	private options: SearchOptions;
+	private options: SearchOptions<T>;
 	private query: string;
+	/** A result waiting on the user's answer to a review question, and the query it's for. */
+	private pending: { query: string; result: T } | null = null;
 	private mode: SearchMode | undefined;
 	private lookup: Lookup<T>;
 	private done: (result: T | null) => void;
@@ -50,7 +63,7 @@ class SearchModal<T> extends Modal {
 	private modeButtons = new Map<string, ButtonComponent>();
 	private messageEl!: HTMLElement;
 
-	constructor(app: App, options: SearchOptions, lookup: Lookup<T>, done: (result: T | null) => void) {
+	constructor(app: App, options: SearchOptions<T>, lookup: Lookup<T>, done: (result: T | null) => void) {
 		super(app);
 		this.options = options;
 		this.query = options.initialQuery;
@@ -107,6 +120,7 @@ class SearchModal<T> extends Modal {
 	private selectMode(mode: SearchMode) {
 		if (this.busy || mode === this.mode) return;
 		this.mode = mode;
+		this.pending = null;
 		this.showMode();
 		this.showMessage('');
 		this.options.onModeChange?.(mode.id);
@@ -128,20 +142,46 @@ class SearchModal<T> extends Modal {
 			this.showMessage(this.options.emptyMessage, true);
 			return;
 		}
+		// Enter again on an unchanged query keeps the result that was questioned.
+		if (this.pending?.query === query) {
+			this.finish(this.pending.result);
+			return;
+		}
 
 		this.setBusy(true);
 		this.showMessage('');
+		this.pending = null;
 		try {
 			const result = await this.lookup(query, this.mode?.id);
 			if (this.closed) return;
-			this.result = result;
-			this.close();
+			const review = this.options.review?.(result);
+			if (review) this.ask(review, query, result);
+			else this.finish(result);
 		} catch (err) {
 			if (this.closed) return;
 			this.showError(toLookupError(err));
 		} finally {
 			this.setBusy(false);
 		}
+	}
+
+	private finish(result: T) {
+		this.result = result;
+		this.close();
+	}
+
+	private ask(review: SearchReview, query: string, result: T) {
+		this.pending = { query, result };
+		this.showMessage(review.message);
+		const choices = this.messageEl.createDiv({ cls: 'dictionary-notes-suggestions' });
+		for (const alternative of review.alternatives) {
+			new ButtonComponent(choices).setButtonText(alternative).onClick(() => {
+				this.query = alternative;
+				this.input.setValue(alternative);
+				void this.search();
+			});
+		}
+		new ButtonComponent(choices).setButtonText(review.keepLabel).onClick(() => this.finish(result));
 	}
 
 	private showError(error: LookupError) {

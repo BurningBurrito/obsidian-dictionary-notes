@@ -3,6 +3,8 @@ import { Sense } from '../../senses';
 import { DictionarySource, WordEntry } from '../types';
 import { collapseWhitespace, uniqueStrings } from '../../../core/utils';
 import { badResponse, httpGet, parseJson } from '../../../core/http';
+import { wikiPageUrl } from '../../../core/wikimedia';
+import { wiktionarySection } from '../languages';
 
 const NAME = 'Free Dictionary API';
 
@@ -10,6 +12,7 @@ const NAME = 'Free Dictionary API';
 // Every field is optional here because we don't control the API.
 interface FdSense {
 	definition?: string;
+	tags?: string[];
 	examples?: string[];
 	quotes?: { text?: string }[];
 	synonyms?: string[];
@@ -36,14 +39,14 @@ export const freeDictionary: DictionarySource = {
 		const url = `https://freedictionaryapi.com/api/v1/entries/${encodeURIComponent(language)}/${encodeURIComponent(word)}`;
 		const response = await httpGet(url, NAME);
 		if (response.status !== 200) throw badResponse(NAME);
-		const entry = parseFreeDictionary(parseJson(response, NAME) as FdResponse, word);
+		const entry = parseFreeDictionary(parseJson(response, NAME) as FdResponse, word, language);
 		if (!entry) throw notFoundError(word);
 		return entry;
 	},
 };
 
 /** Returns null when the response has no usable definitions. */
-export function parseFreeDictionary(data: FdResponse, query: string): WordEntry | null {
+export function parseFreeDictionary(data: FdResponse, query: string, language = 'en'): WordEntry | null {
 	const word = data.word ?? query;
 	const entries = Array.isArray(data.entries) ? data.entries : [];
 
@@ -66,6 +69,8 @@ export function parseFreeDictionary(data: FdResponse, query: string): WordEntry 
 
 	return {
 		word,
+		language,
+		explainedIn: 'en',
 		phonetic,
 		audioUrl: '',
 		etymology: '',
@@ -81,9 +86,9 @@ export function parseFreeDictionary(data: FdResponse, query: string): WordEntry 
 		source: {
 			id: 'free-dictionary',
 			name: `${NAME} (Wiktionary)`,
-			url:
-				data.source?.url ??
-				`https://en.wiktionary.org/wiki/${encodeURIComponent(word)}`,
+			// Built here: the API's URL isn't encoded (a phrase's spaces would break the
+			// Markdown link) and doesn't point to the word's language section.
+			url: wikiPageUrl('en.wiktionary.org', word, wiktionarySection(language)),
 			license: data.source?.license?.name ?? 'CC BY-SA 4.0',
 			licenseUrl:
 				data.source?.license?.url ?? 'https://creativecommons.org/licenses/by-sa/4.0/',
@@ -104,5 +109,11 @@ function pushSense(senses: Sense[], raw: FdSense, partOfSpeech: string, depth: 0
 		synonyms: uniqueStrings(raw.synonyms ?? []),
 		antonyms: uniqueStrings(raw.antonyms ?? []),
 		depth,
+		baseWord: raw.tags?.includes('form of') ? formOf(definition) : undefined,
 	});
+}
+
+/** "simple past of run" -> "run"; "first-person singular preterite indicative of correr" -> "correr" */
+function formOf(definition: string): string | undefined {
+	return / of ([^,;:()]+?)\.?$/u.exec(definition)?.[1];
 }

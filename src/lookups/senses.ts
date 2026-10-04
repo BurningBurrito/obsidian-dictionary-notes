@@ -10,6 +10,8 @@ export interface Sense {
 	antonyms: string[];
 	/** 0 for a main sense, 1 for a sub-sense of the main sense before it. */
 	depth: 0 | 1;
+	/** For a form of another word ("ran", "corrí"), that word ("run", "correr"). */
+	baseWord?: string;
 }
 
 /**

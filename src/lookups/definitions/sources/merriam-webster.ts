@@ -103,6 +103,8 @@ export function parseMerriamWebster(data: MwEntry[], query: string): WordEntry |
 
 	return {
 		word,
+		language: 'en',
+		explainedIn: 'en',
 		phonetic: pronunciation?.mw ? `\\${pronunciation.mw}\\` : '',
 		audioUrl: audioUrl(pronunciation?.sound?.audio),
 		etymology: etymology ?? '',

@@ -1,23 +1,23 @@
 import { LookupError, notFoundError, toLookupError } from '../../../core/errors';
-import { DictionarySource, LookupOptions, SourceId, WordEntry } from '../types';
+import { DictionarySource, LookupOptions, MainSourceId, WordEntry } from '../types';
 import { freeDictionary } from './free-dictionary';
 import { merriamWebster } from './merriam-webster';
 import { wiktionary } from './wiktionary';
 
-const SOURCES: Record<SourceId, DictionarySource> = {
+const SOURCES: Record<MainSourceId, DictionarySource> = {
 	'free-dictionary': freeDictionary,
 	wiktionary: wiktionary,
 	'merriam-webster': merriamWebster,
 };
 
 /** Labels for the source dropdown in settings. */
-export const SOURCE_OPTIONS: Record<SourceId, string> = {
+export const SOURCE_OPTIONS: Record<MainSourceId, string> = {
 	'free-dictionary': 'Free Dictionary API (no key needed)',
 	wiktionary: 'Wiktionary',
 	'merriam-webster': 'Merriam-Webster (API key required)',
 };
 
-export function isSourceId(value: unknown): value is SourceId {
+export function isSourceId(value: unknown): value is MainSourceId {
 	return typeof value === 'string' && value in SOURCES;
 }
 
@@ -29,22 +29,38 @@ export interface LookupResult {
 
 export async function lookupWord(
 	word: string,
-	sourceId: SourceId,
+	sourceId: MainSourceId,
 	options: LookupOptions,
 	useFallback: boolean,
 ): Promise<LookupResult> {
-	const primary = SOURCES[sourceId];
+	const backup = SOURCES[sourceId === 'wiktionary' ? 'free-dictionary' : 'wiktionary'];
+	return lookupWithBackup(
+		word,
+		{ source: SOURCES[sourceId], options },
+		useFallback ? { source: backup, options } : undefined,
+	);
+}
+
+export interface SourceCall {
+	source: DictionarySource;
+	options: LookupOptions;
+}
+
+/** Look a word up in one source, and in a backup source if that fails. */
+export async function lookupWithBackup(
+	word: string,
+	primary: SourceCall,
+	backup: SourceCall | undefined,
+): Promise<LookupResult> {
 	try {
-		return { entry: await lookupAnyCase(primary, word, options) };
+		return { entry: await lookupAnyCase(primary.source, word, primary.options) };
 	} catch (err) {
 		const error = toLookupError(err);
 		// Offline means the backup would fail the same way.
-		if (!useFallback || error.kind === 'offline') throw error;
-
-		const backup = SOURCES[sourceId === 'wiktionary' ? 'free-dictionary' : 'wiktionary'];
+		if (!backup || error.kind === 'offline') throw error;
 		try {
-			const entry = await lookupAnyCase(backup, word, options);
-			return { entry, fallback: { sourceName: primary.name, error } };
+			const entry = await lookupAnyCase(backup.source, word, backup.options);
+			return { entry, fallback: { sourceName: primary.source.name, error } };
 		} catch {
 			// The main source's error is the one the user can act on.
 			throw error;
