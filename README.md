@@ -7,7 +7,7 @@ Type a word, an idiom, or a few words from a quote, pick the result you want, an
 ## Features
 
 - **Three lookup types, one plugin:**
-  - **Definitions** of words, from Free Dictionary API, Wiktionary, or Merriam-Webster.
+  - **Definitions** of words, from Free Dictionary API, Wiktionary, or Merriam-Webster. Spanish words can be defined in Spanish (from Wikcionario) or explained in English.
   - **Idioms** such as "break the ice", with meanings, examples, and origin, from Wiktionary.
   - **Quotes** by keyword, author, or topic, with the author, work, and year, from Wikiquote.
 - **Quick lookup:** select the book icon in the ribbon and choose **Definition**, **Idiom**, or **Quote**, or run a command from the command palette. If you have text selected in a note, it's used as the search text.
@@ -18,7 +18,7 @@ Type a word, an idiom, or a few words from a quote, pick the result you want, an
 - **Clear errors:** you get a plain message when you're offline, nothing is found, a service is busy or down, or your API key is wrong. Errors appear in the search window so you can retry straight away.
 - **Safe with existing notes:** if a note already exists, Dictionary Notes opens it or creates a numbered copy. It never overwrites a note.
 
-Idioms and quotes are in English. Definitions support any Wiktionary language code. Requires Obsidian 1.13.0 or later.
+Definitions support Spanish and any Wiktionary language code. Idioms and quotes are in English. Requires Obsidian 1.13.0 or later.
 
 ## Installation
 
@@ -45,9 +45,16 @@ Select the book icon in the ribbon and choose a type, or open the command palett
 
 ### Definitions
 
-1. Type a word and press <kbd>Enter</kbd>.
-2. If the word has several meanings, choose one. Type to filter the list.
-3. The note is created in your Definitions folder and opened.
+1. Choose a button at the top of the search window:
+   - **English** (or your main language from the Language setting): the word, from your dictionary source.
+   - **Español**: a Spanish word, defined in Spanish, from Wikcionario.
+   - **Spanish → English**: a Spanish word, explained in English.
+
+   Dictionary Notes remembers the button you used last. To hide the buttons, turn off **Spanish definitions → Spanish in the search window**.
+2. Type a word and press <kbd>Enter</kbd>. If a Spanish word isn't found, you're offered close spellings with accents, such as `canción` for `cancion`.
+3. If the word is a form of another word, such as `corrí` (of `correr`) or `ran` (of `run`), you can look up the base word instead, or keep the form.
+4. If the word has several meanings, choose one. Type to filter the list.
+5. The note is created and opened: English words in your Definitions folder, Spanish words in your Spanish folder (default: `Definitions/Español`).
 
 ### Idioms
 
@@ -114,6 +121,15 @@ Each type has its own section with these three settings:
 | Language | `en` | Language code for Free Dictionary API and Wiktionary. Merriam-Webster is English only. |
 | Use a backup source | On | If the main source fails or has no entry, try Wiktionary instead (or Free Dictionary API when Wiktionary is the main source). |
 
+**Spanish definitions** has:
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| Spanish in the search window | On | Shows the **English**, **Español**, and **Spanish → English** buttons when looking up a word. |
+| Note folder | `Definitions/Español` | Folder for notes about Spanish words, whether defined in Spanish or explained in English. |
+| Template file | _(empty)_ | Template for definitions written in Spanish. Leave empty to use the built-in Spanish template. Spanish words explained in English use the Definitions template. |
+| Create an editable template | | Saves the built-in Spanish template to `Templates/Spanish definition note.md` and selects it. |
+
 **Idioms** also has:
 
 | Setting | Default | Description |
@@ -141,6 +157,7 @@ When a variable is the whole value of a property, such as `synonyms: {{synonyms}
 | Variable | Contents |
 | --- | --- |
 | `{{word}}` | The word as the dictionary spells it |
+| `{{language}}` | Language code of the word, such as `en` or `es` |
 | `{{definition}}` | The meaning you chose |
 | `{{partOfSpeech}}` | Part of speech of that meaning, such as `noun` |
 | `{{phonetic}}` | Pronunciation (IPA, or Merriam-Webster's respelling) |
@@ -154,13 +171,13 @@ When a variable is the whole value of a property, such as `synonyms: {{synonyms}
 
 Not every dictionary provides every field. An unavailable field is left empty.
 
-| Field | Free Dictionary API | Wiktionary | Merriam-Webster |
-| --- | --- | --- | --- |
-| Pronunciation | Yes | No | Yes |
-| Examples | Yes | Rarely | Yes |
-| Synonyms and antonyms | Often | No | No |
-| Etymology | No | No | Yes |
-| Audio | No | No | Yes |
+| Field | Free Dictionary API | Wiktionary | Merriam-Webster | Wikcionario (Spanish) |
+| --- | --- | --- | --- | --- |
+| Pronunciation | Yes | No | Yes | Yes |
+| Examples | Yes | Rarely | Yes | Often |
+| Synonyms and antonyms | Often | No | No | Sometimes |
+| Etymology | No | No | Yes | Yes |
+| Audio | No | No | Yes | No |
 
 ### Idiom variables
 
@@ -215,6 +232,39 @@ tags:
 
 ---
 Source: [{{source}}]({{sourceUrl}}), {{license}}
+```
+
+Definitions written in Spanish:
+
+```markdown
+---
+word: {{word}}
+language: {{language}}
+part-of-speech: {{partOfSpeech}}
+phonetic: {{phonetic}}
+synonyms: {{synonyms}}
+source: {{source}}
+created: {{date}}
+tags:
+  - dictionary
+  - spanish
+---
+**{{partOfSpeech}}** {{phonetic}}
+
+> {{definition}}
+
+{{examples}}
+
+## Etimología
+
+{{etymology}}
+
+## Todas las definiciones
+
+{{allDefinitions}}
+
+---
+Fuente: [{{source}}]({{sourceUrl}}), {{license}}
 ```
 
 Idioms:
@@ -278,8 +328,9 @@ Dictionary Notes needs an internet connection to look things up. Each lookup sen
 
 | Service | Used for | Account needed |
 | --- | --- | --- |
-| [Free Dictionary API](https://freedictionaryapi.com) (`freedictionaryapi.com`) | Definitions (default source); backup source for idioms | No |
-| [Wiktionary](https://en.wiktionary.org) (`en.wiktionary.org`), run by the [Wikimedia Foundation](https://foundation.wikimedia.org/wiki/Policy:Privacy_policy) | Definitions (optional source and default backup); idiom search, meanings, and origin | No |
+| [Free Dictionary API](https://freedictionaryapi.com) (`freedictionaryapi.com`) | Definitions (default source), including Spanish words explained in English; backup source for idioms | No |
+| [Wiktionary](https://en.wiktionary.org) (`en.wiktionary.org`), run by the [Wikimedia Foundation](https://foundation.wikimedia.org/wiki/Policy:Privacy_policy) | Definitions (optional source and default backup), including Spanish words explained in English; idiom search, meanings, and origin | No |
+| [Wikcionario](https://es.wiktionary.org) (`es.wiktionary.org`), the Spanish Wiktionary, run by the Wikimedia Foundation | Definitions written in Spanish, and spelling suggestions for Spanish words | No |
 | [Merriam-Webster Dictionary API](https://dictionaryapi.com) (`dictionaryapi.com`) | Definitions (optional source) | Yes. Requires a free account and API key. Free keys are for non-commercial use under [Merriam-Webster's terms](https://dictionaryapi.com/info/terms-of-service). |
 | [Wikiquote](https://en.wikiquote.org) (`en.wikiquote.org`), run by the Wikimedia Foundation | Quote search and quotes | No |
 | [Wikidata](https://www.wikidata.org) (`www.wikidata.org`), run by the Wikimedia Foundation | Checking whether a Wikiquote page is about a person, so quotes are credited correctly | No |
@@ -290,12 +341,21 @@ Dictionary Notes has no telemetry or analytics, and it doesn't read or send your
 
 ## Content and licensing
 
-- **Definitions** from Free Dictionary API and Wiktionary come from [Wiktionary](https://en.wiktionary.org) and are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Definitions from Merriam-Webster are © Merriam-Webster, Inc. and subject to [their terms](https://dictionaryapi.com/info/terms-of-service).
+- **Definitions** from Free Dictionary API and Wiktionary come from [Wiktionary](https://en.wiktionary.org) and are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Definitions written in Spanish come from [Wikcionario](https://es.wiktionary.org) and are also licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Definitions from Merriam-Webster are © Merriam-Webster, Inc. and subject to [their terms](https://dictionaryapi.com/info/terms-of-service).
 - **Idioms** come from [Wiktionary](https://en.wiktionary.org) (directly, or through Free Dictionary API) and are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 - **Quotes** come from [Wikiquote](https://en.wikiquote.org), whose collection is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Quotes from works that are still under copyright remain their authors' and are included on Wikiquote under fair use, as described in [Wikiquote's copyright policy](https://en.wikiquote.org/wiki/Wikiquote:Copyrights).
 - **Wikidata** is used only to check whether a page is about a person. Nothing from it is saved in your notes. Its data is available under [CC0](https://www.wikidata.org/wiki/Wikidata:Copyright).
 
 If you publish notes that contain this content, keep the attribution. The built-in templates add a source line for this.
+
+## Upgrading from 1.1
+
+Your settings, templates, and hotkeys carry over. What's new:
+
+- **Spanish definitions:** the definitions search window has **English**, **Español**, and **Spanish → English** buttons. It starts on **English**, which works as before. To hide the buttons, turn off **Spanish definitions → Spanish in the search window**.
+- **Forms of words:** looking up a form such as `ran` offers the base word (`run`) first. You can keep the form.
+- **Fixed:** source links from Free Dictionary API for phrases such as `ice cream` now work, and non-English words link to their language's section on Wiktionary.
+- **Properties:** a single word with accents, such as `café`, is no longer put in quotes. Both forms are valid.
 
 ## Upgrading from 1.0
 
@@ -343,7 +403,7 @@ The code is organized by lookup type. `src/core/` has the shared flow, network, 
 
 - Inspired by [Book Search](https://github.com/anpigon/obsidian-book-search-plugin) by anpigon (MIT License). Dictionary Notes follows its workflow but doesn't include its code.
 - Built from the [Obsidian sample plugin](https://github.com/obsidianmd/obsidian-sample-plugin).
-- Definitions by [Free Dictionary API](https://freedictionaryapi.com), [Wiktionary](https://en.wiktionary.org), and [Merriam-Webster](https://dictionaryapi.com).
+- Definitions by [Free Dictionary API](https://freedictionaryapi.com), [Wiktionary](https://en.wiktionary.org), [Merriam-Webster](https://dictionaryapi.com), and [Wikcionario](https://es.wiktionary.org).
 - Idioms by [Wiktionary](https://en.wiktionary.org), with [Free Dictionary API](https://freedictionaryapi.com) as a backup.
 - Quotes by [Wikiquote](https://en.wikiquote.org), with person checks by [Wikidata](https://www.wikidata.org).
 
