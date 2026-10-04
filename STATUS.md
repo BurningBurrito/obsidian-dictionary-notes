@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update — Spanish definitions: Phase 2 design proposed, **waiting for approval**
+**Current phase:** Update — Spanish definitions: Phase 3 (build) done; next Phase 4 (test)
 **Last updated:** 2026-10-03
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
@@ -41,10 +41,29 @@ approval), 3 build, 4 test, 5 release.
       (**Sinónimos:**, **Antónimo:**, **Ejemplo:**); pronunciation in an AFI line ([koˈreɾ]); verb forms
       are marked (Wikcionario `definicion-impropia`, English Wiktionary `form-of-definition`) and end with
       a link to the base word
-- [x] Phase 2 design written (summary below)
+- [x] Phase 2 design written (summary below) and **approved** (all four choices: buttons on by default,
+      `Definitions/Español`, fix the English phrase links, base word for English forms too)
+- [x] Phase 3 build (local commits on `feature/spanish-definitions`, not pushed):
+  - 79f39cd feature: modes English / Español / Spanish → English (remembered; hidden when off; duplicate
+    hidden when the main language is `es`); Wikcionario source + reader (definitions with labels,
+    synonyms, antonyms, examples incl. separate example lists, IPA, origin, verb forms); English
+    explanations as Español's backup; folder/template rule via a new `target` hook; dynamic buttons via
+    `searchModes`; search window review step ("corrí" is a form of "correr"); accent-forgiving
+    suggestions filtered to close spellings (cancion → canción, not chanson); `{{language}}`; Spanish
+    built-in template; Free Dictionary API links encoded + language sections; accented single words
+    unquoted in properties (English output unchanged, golden tests pass)
+  - Live-checked: canción (Música label, [kãnˈsjõn], origin, example), correr (37 senses, synonyms),
+    corrí → correr, canciones → canción, sin es-en ("without", #Spanish link), echar de menos link,
+    English sin unchanged, Wikcionario down → English explanations with notice
+  - 31779db tests: **101 tests, all pass** (new spanish suite + Spanish flow and settings tests);
+    `npm run test:record -- <suite>` records only named suites
+  - Docs: README (Spanish usage, settings, `{{language}}`, Wikcionario field column, Spanish built-in
+    template, network row for es.wiktionary.org, licensing, credits, "Upgrading from 1.1"); README
+    templates verified identical to the code; no placeholder text
+  - build, lint, lint without moment types: clean; main.js 49,028 bytes (was 40,336)
 
 ### In progress
-- [ ] Waiting for approval of the Phase 2 design
+- [ ] Phase 4: test (user in test vault; ask before pushing the branch for CI and the Review branch scan)
 
 ### Next
 - [ ] Phase 3: build · Phase 4: test · Phase 5: release (GitHub release; the plugin is listed)
@@ -55,7 +74,7 @@ approval), 3 build, 4 test, 5 release.
   explained in English.
 - Future release (user): Spanish idioms, Spanish quotes, plugin interface in Spanish.
 
-### Design (proposed, pending approval)
+### Design (approved)
 - Search window modes for definitions: **English** (main language from the Language setting, unchanged
   behavior) · **Español** (Wikcionario) · **Spanish → English**; last used remembered; a setting hides
   the buttons. If the main language is already `es`, the duplicate button is hidden.
@@ -67,7 +86,7 @@ approval), 3 build, 4 test, 5 release.
 - New settings keys only (nothing renamed); version 1.2.0; es.wiktionary.org added to network disclosure.
 
 ### Open questions / blockers
-- Design approval (see the choices listed in the Phase 2 summary).
+- Pushing `feature/spanish-definitions` (for CI and the dashboard's Review branch scan) needs approval.
 
 ---
 
