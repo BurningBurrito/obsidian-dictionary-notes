@@ -1,8 +1,56 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update 1.x — Idioms and Quotes: **1.1.0 released**; remaining: dashboard follow-up (user)
-**Last updated:** 2026-10-02
+**Current phase:** Update — Spanish definitions: Phase 1 done, **waiting for approval**
+**Last updated:** 2026-10-03
 
-## Update: Idioms and Quotes (branch `feature/idioms-quotes`)
+## Update: Spanish definitions (branch `feature/spanish-definitions`)
+
+Goal (user): definitions support Spanish; recommend how to extend idioms and quotes in a future release.
+Phases as in the previous update: 1 review and research (stop for approval), 2 design (stop for
+approval), 3 build, 4 test, 5 release.
+
+### Done
+- [x] Created branch `feature/spanish-definitions` from `main` (9490755, version 1.1.0)
+- [x] Phase 1 — what works today (live, plugin's own lookup code, Language setting `es`): Free Dictionary
+      API and Wiktionary already return English Wiktionary's **Spanish entries, explained in English**
+      (canción → "song"; correr → 13 senses; IPA from Free Dictionary API; Spanish examples). Gaps:
+      definitions are English glosses; Spanish "sin" and English "sin" collide as `Definitions/sin.md`;
+      language is one global setting; source links go to the page top (English section) and Free
+      Dictionary API links break on phrases ("echar de menos"); verb forms (corrí) don't offer the base
+      word; Merriam-Webster (Collegiate) is English only and ignores the language
+- [x] Phase 1 — Spanish sources:
+  - Wikcionario (es.wiktionary.org): CC BY-SA 4.0, definitions **in Spanish** (correr: 37, with inline
+    Sinónimos/Antónimo; verb forms marked "Forma verbal"; Etimología, Locuciones, Refranes sections).
+    No REST definition endpoint (HTTP 501); needs a parser for action=parse HTML (dl/dt/dd under
+    part-of-speech headings in the "Español" section)
+  - Merriam-Webster Spanish-English API: bilingual (English explanations + translations), endpoint
+    /references/spanish/json/; separate key not confirmed by the docs page
+  - RAE (dle.rae.es): no official public API; only unofficial scrapers (not suitable)
+- [x] Phase 1 — for idioms and quotes (future release): en.wiktionary Category:Spanish_idioms 3,341
+      (English explanations); es.wiktionary ES:Locuciones 140, ES:Refranes 269; es.wikiquote 8,929 pages
+      (CC BY-SA 4.0), sections "Citas"/"De sus obras"/"Citas sobre …", attribution headings rare
+      (Atribuidas 43 pages, Dudosas 11, Disputadas 1, Erróneamente atribuidas 0, no frames on sampled
+      pages); en.wikiquote already keeps Spanish originals in {{original}} (Cervantes 24/206, Borges
+      14/156, García Márquez 0/28)
+- [x] Phase 1 — interface language: Obsidian's `getLanguage()` (since 1.8.7) makes a Spanish UI possible;
+      separate from Spanish definitions
+
+### In progress
+- [ ] Waiting for the user: which Spanish definitions (in Spanish, in English, or both) + approval
+
+### Next
+- [ ] Phase 2: design, **wait for approval**
+- [ ] Phase 3: build · Phase 4: test · Phase 5: release (GitHub release; the plugin is listed)
+
+### Decisions made
+- (pending approval) Recommended: both kinds for Spanish words, chosen per lookup; Wikcionario as the new
+  source for Spanish-language definitions; keep English-explained Spanish from the current sources.
+
+### Open questions / blockers
+- What "definitions support Spanish" should mean: definitions written in Spanish, in English, or both.
+
+---
+
+## Previous: 1.1.0 Idioms and Quotes (released 2026-10-03; branch `feature/idioms-quotes`, deleted)
 
 ### Done
 - [x] Checked listing status: **listed** in the community directory. `dictionary-notes` appears in
@@ -86,8 +134,6 @@
 - [x] User reported all tests passed. Files confirm the manual UI checks in `test-vault/` (new version,
       19:42–19:45: Definitions/fag.md, Idioms/give me a break.md, a quote note from a topic search;
       settings saved with all new keys, quoteSearchMode remembered as "topic")
-
-### In progress
 - [x] Upgrade test, **untouched-settings path** (user, 20:03–20:07): vault opened, new build installed
       (main.js identical to the current build), definition/idiom/quote notes created; settings were
       all defaults, so new definition notes went to `Definitions/` as designed
@@ -127,12 +173,10 @@
 - [x] Wrote the listing's long description (plain text; shown on the listing's Overview tab and sidebar,
       above the README excerpt, so it doesn't repeat the README)
 
-### In progress
+### Carried over
 - [ ] User, on community.obsidian.md: **Check for new releases**, read the scan result for 1.1.0, then
       **Edit listing**: paste the short description ("Build a dictionary in your vault: look up definitions,
       idioms, and quotes, and save each one as a note using your own templates.") and the long description
-
-### Next
 - [ ] Later (user: leave for later): screenshots (README in `docs/` or dashboard listing, 1200×800), mobile test, Merriam-Webster
       test with a real key, the "ice cream" source-link fix for Definitions, work-page authors via Wikidata
 
