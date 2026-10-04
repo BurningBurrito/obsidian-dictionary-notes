@@ -26,9 +26,45 @@ tags:
 Source: [{{source}}]({{sourceUrl}}), {{license}}
 `;
 
+/**
+ * For definitions written in Spanish (Wikcionario). Headings are in Spanish;
+ * property names stay in English so notes in both languages work together in
+ * searches and Bases.
+ */
+export const SPANISH_TEMPLATE = `---
+word: {{word}}
+language: {{language}}
+part-of-speech: {{partOfSpeech}}
+phonetic: {{phonetic}}
+synonyms: {{synonyms}}
+source: {{source}}
+created: {{date}}
+tags:
+  - dictionary
+  - spanish
+---
+**{{partOfSpeech}}** {{phonetic}}
+
+> {{definition}}
+
+{{examples}}
+
+## Etimología
+
+{{etymology}}
+
+## Todas las definiciones
+
+{{allDefinitions}}
+
+---
+Fuente: [{{source}}]({{sourceUrl}}), {{license}}
+`;
+
 export function buildVariables(entry: WordEntry, sense: Sense): TemplateVariables {
 	return {
 		word: entry.word,
+		language: entry.language,
 		definition: sense.definition,
 		partOfSpeech: sense.partOfSpeech,
 		phonetic: entry.phonetic,

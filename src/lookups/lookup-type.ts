@@ -1,10 +1,18 @@
 import type { App } from 'obsidian';
 import type { TemplateVariables } from '../core/render';
 import type DictionaryNotesPlugin from '../main';
-import type { NoteSettingKey } from '../settings';
-import type { SearchMode } from '../ui/search-modal';
+import type { DictionaryNotesSettings, NoteSettingKey } from '../settings';
+import type { SearchMode, SearchReview } from '../ui/search-modal';
 
 export type LookupTypeId = 'definitions' | 'idioms' | 'quotes';
+
+/** Where a note goes and which template it's made from. */
+export interface NoteTarget {
+	folder: string;
+	templateFile: string;
+	/** Used when templateFile is empty or missing. */
+	builtInTemplate: string;
+}
 
 /**
  * One kind of dictionary note: definitions, idioms, or quotes. The shared flow
@@ -35,14 +43,20 @@ export interface LookupType<Found, Item, Detail> {
 	};
 	/** Where this type's folder and template file live in the settings. */
 	settingKeys: { folder: NoteSettingKey; templateFile: NoteSettingKey };
+	/** Search buttons that depend on the settings; overrides search.modes. Empty or undefined: no buttons. */
+	searchModes?(settings: DictionaryNotesSettings): SearchMode[] | undefined;
 	/** Settings key that remembers the last search mode (types with modes only). */
-	searchModeKey?: 'quoteSearchMode';
+	searchModeKey?: 'quoteSearchMode' | 'definitionSearchMode';
 	defaultTemplate: string;
 	/** Where "Create an editable template" saves a copy of the built-in template. */
 	templateCopyPath: string;
+	/** Folder and template for one item, when they depend on the item. Default: settingKeys and defaultTemplate. */
+	target?(item: Item, settings: DictionaryNotesSettings): NoteTarget;
 
 	/** Look up what the user typed. Runs inside the search window; throw a LookupError on failure. */
 	find(query: string, plugin: DictionaryNotesPlugin, mode: string | undefined): Promise<Found>;
+	/** A question to ask before the search window closes, e.g. when the word is a form of another word. */
+	review?(found: Found): SearchReview | undefined;
 	/** A message to show once the search window closes, e.g. that a backup source answered. */
 	notice?(found: Found): string | undefined;
 	/** Pick what the note is about. May show a list or fetch more data. Null means cancelled. */

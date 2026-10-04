@@ -4,6 +4,7 @@ import { badResponse, httpGet, parseJson } from '../../../core/http';
 import { uniqueStrings } from '../../../core/utils';
 import { WIKIMEDIA_HEADERS } from '../../../core/wikimedia';
 import { Sense } from '../../senses';
+import { wiktionarySection } from '../languages';
 import { DictionarySource, WordEntry } from '../types';
 
 const NAME = 'Wiktionary';
@@ -47,19 +48,22 @@ export function parseWiktionary(
 		// again as its own definition. Use the nesting only to mark depth.
 		let children = new Set<string>();
 		for (const def of usage.definitions ?? []) {
-			const { text, subsenses } = parseDefinitionHtml(def.definition ?? '');
+			const { text, subsenses, baseWord } = parseDefinitionHtml(def.definition ?? '');
 			if (!text) continue;
 			const depth = children.has(text) ? 1 : 0;
 			if (depth === 0) children = new Set(subsenses);
 			else subsenses.forEach((s) => children.add(s));
 			const examples = uniqueStrings((def.examples ?? []).map(htmlToText));
-			senses.push({ partOfSpeech, definition: text, examples, synonyms: [], antonyms: [], depth });
+			senses.push({ partOfSpeech, definition: text, examples, synonyms: [], antonyms: [], depth, baseWord });
 		}
 	}
 	if (senses.length === 0) return null;
 
+	const section = wiktionarySection(language);
 	return {
 		word,
+		language,
+		explainedIn: 'en',
 		phonetic: '',
 		audioUrl: '',
 		etymology: '',
@@ -69,18 +73,23 @@ export function parseWiktionary(
 		source: {
 			id: 'wiktionary',
 			name: NAME,
-			url: `https://en.wiktionary.org/wiki/${encodeURIComponent(word.replace(/ /g, '_'))}`,
+			url:
+				`https://en.wiktionary.org/wiki/${encodeURIComponent(word.replace(/ /g, '_'))}` +
+				(section ? `#${encodeURIComponent(section)}` : ''),
 			license: 'CC BY-SA 4.0',
 			licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
 		},
 	};
 }
 
-// Wiktionary definitions sometimes nest sub-senses in an <ol>.
-function parseDefinitionHtml(html: string): { text: string; subsenses: string[] } {
+// Wiktionary definitions sometimes nest sub-senses in an <ol>. A form of
+// another word ("first-person singular preterite of correr") links to that word.
+function parseDefinitionHtml(html: string): { text: string; subsenses: string[]; baseWord?: string } {
 	const root = parseHtml(html);
 	const subsenses = Array.from(root.querySelectorAll(':scope > ol > li'))
 		.map((li) => elementText(li))
 		.filter(Boolean);
-	return { text: elementText(root), subsenses };
+	const link = root.querySelector('.form-of-definition-link a');
+	const baseWord = link ? link.getAttribute('title') || link.textContent || undefined : undefined;
+	return { text: elementText(root), subsenses, baseWord };
 }

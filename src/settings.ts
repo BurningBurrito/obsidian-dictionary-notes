@@ -9,12 +9,15 @@ import {
 import { ensureFolder } from './core/notes';
 import { AnyLookupType, LOOKUP_TYPES } from './lookups';
 import { isSourceId, SOURCE_OPTIONS } from './lookups/definitions/sources';
-import type { SourceId } from './lookups/definitions/types';
+import { SPANISH_TEMPLATE } from './lookups/definitions/template';
+import type { MainSourceId } from './lookups/definitions/types';
 import type DictionaryNotesPlugin from './main';
 
 export type ExistingNoteAction = 'open' | 'new';
 
 export const QUOTE_SEARCH_MODES = ['keyword', 'author', 'topic'] as const;
+/** main: the Language setting (as in 1.1); es: in Spanish; es-en: Spanish word, explained in English. */
+export const DEFINITION_SEARCH_MODES = ['main', 'es', 'es-en'] as const;
 
 export interface DictionaryNotesSettings {
 	// Shared by all lookup types.
@@ -24,11 +27,20 @@ export interface DictionaryNotesSettings {
 	// Definitions. These keep their 1.0 names so saved settings carry over unchanged.
 	folder: string;
 	templateFile: string;
-	source: SourceId;
+	source: MainSourceId;
 	language: string;
 	useFallback: boolean;
 	/** Name of the secret in Obsidian's keychain that holds the key (not the key itself). */
 	mwKeySecret: string;
+	/** The definitions search mode used last: one of DEFINITION_SEARCH_MODES. */
+	definitionSearchMode: string;
+
+	// Spanish definitions.
+	/** Show the English / Español / Spanish → English buttons in the search window. */
+	spanishEnabled: boolean;
+	spanishFolder: string;
+	/** Template for definitions written in Spanish. */
+	spanishTemplateFile: string;
 
 	// Idioms.
 	idiomFolder: string;
@@ -46,6 +58,8 @@ export interface DictionaryNotesSettings {
 export type NoteSettingKey =
 	| 'folder'
 	| 'templateFile'
+	| 'spanishFolder'
+	| 'spanishTemplateFile'
 	| 'idiomFolder'
 	| 'idiomTemplateFile'
 	| 'quoteFolder'
@@ -61,6 +75,11 @@ export const DEFAULT_SETTINGS: DictionaryNotesSettings = {
 	language: 'en',
 	useFallback: true,
 	mwKeySecret: '',
+	definitionSearchMode: 'main',
+
+	spanishEnabled: true,
+	spanishFolder: 'Definitions/Español',
+	spanishTemplateFile: '',
 
 	idiomFolder: 'Idioms',
 	idiomTemplateFile: '',
@@ -87,6 +106,9 @@ export function sanitizeSettings(saved: Partial<DictionaryNotesSettings> | null)
 	}
 	if (!(QUOTE_SEARCH_MODES as readonly string[]).includes(settings.quoteSearchMode)) {
 		settings.quoteSearchMode = DEFAULT_SETTINGS.quoteSearchMode;
+	}
+	if (!(DEFINITION_SEARCH_MODES as readonly string[]).includes(settings.definitionSearchMode)) {
+		settings.definitionSearchMode = DEFAULT_SETTINGS.definitionSearchMode;
 	}
 	return settings;
 }
@@ -126,14 +148,43 @@ export class DictionaryNotesSettingTab extends PluginSettingTab {
 					},
 				],
 			},
-			...LOOKUP_TYPES.map(
-				(type): SettingDefinitionItem<SettingKey> => ({
+			...LOOKUP_TYPES.flatMap((type): SettingDefinitionItem<SettingKey>[] => [
+				{
 					type: 'group',
 					heading: type.heading,
 					items: [...this.typeItems(type), ...this.noteItems(type)],
-				}),
-			),
+				},
+				...(type.id === 'definitions' ? [this.spanishGroup()] : []),
+			]),
 		];
+	}
+
+	private spanishGroup(): SettingDefinitionItem<SettingKey> {
+		return {
+			type: 'group',
+			heading: 'Spanish definitions',
+			items: [
+				{
+					name: 'Source',
+					desc: 'Definitions written in Spanish come from Wikcionario (es.wiktionary.org). Spanish words explained in English come from Free Dictionary API and Wiktionary. No account needed. Each lookup sends the word to these services.',
+				},
+				{
+					name: 'Spanish in the search window',
+					desc: 'Show the English, Español, and Spanish → English buttons when looking up a word.',
+					control: { type: 'toggle', key: 'spanishEnabled' },
+				},
+				...this.noteRows({
+					folderKey: 'spanishFolder',
+					folderDesc: "Notes for Spanish words are created in this folder. It's created if it doesn't exist.",
+					templateKey: 'spanishTemplateFile',
+					templateDesc:
+						'For definitions written in Spanish. Leave empty to use the built-in Spanish template. Spanish words explained in English use the Definitions template.',
+					copyPath: 'Templates/Spanish definition note.md',
+					template: SPANISH_TEMPLATE,
+					noun: 'Spanish definition',
+				}),
+			],
+		};
 	}
 
 	async setControlValue(key: string, value: unknown): Promise<void> {
@@ -144,34 +195,53 @@ export class DictionaryNotesSettingTab extends PluginSettingTab {
 
 	/** Folder, template, and template copy: the same three rows for every type. */
 	private noteItems(type: AnyLookupType): SettingGroupItem<SettingKey>[] {
-		const folderKey = type.settingKeys.folder;
+		return this.noteRows({
+			folderKey: type.settingKeys.folder,
+			folderDesc: `New ${type.noun} notes are created in this folder. It's created if it doesn't exist.`,
+			templateKey: type.settingKeys.templateFile,
+			templateDesc: 'Leave empty to use the built-in template. The README lists the available variables.',
+			copyPath: type.templateCopyPath,
+			template: type.defaultTemplate,
+			noun: type.noun,
+		});
+	}
+
+	private noteRows(rows: {
+		folderKey: NoteSettingKey;
+		folderDesc: string;
+		templateKey: NoteSettingKey;
+		templateDesc: string;
+		copyPath: string;
+		template: string;
+		noun: string;
+	}): SettingGroupItem<SettingKey>[] {
 		return [
 			{
 				name: 'Note folder',
-				desc: `New ${type.noun} notes are created in this folder. It's created if it doesn't exist.`,
-				aliases: [`${type.noun} folder`],
+				desc: rows.folderDesc,
+				aliases: [`${rows.noun} folder`],
 				control: {
 					type: 'folder',
-					key: folderKey,
-					placeholder: DEFAULT_SETTINGS[folderKey],
-					defaultValue: DEFAULT_SETTINGS[folderKey],
+					key: rows.folderKey,
+					placeholder: DEFAULT_SETTINGS[rows.folderKey],
+					defaultValue: DEFAULT_SETTINGS[rows.folderKey],
 				},
 			},
 			{
 				name: 'Template file',
-				desc: 'Leave empty to use the built-in template. The README lists the available variables.',
-				aliases: [`${type.noun} template`],
+				desc: rows.templateDesc,
+				aliases: [`${rows.noun} template`],
 				control: {
 					type: 'file',
-					key: type.settingKeys.templateFile,
-					placeholder: type.templateCopyPath,
+					key: rows.templateKey,
+					placeholder: rows.copyPath,
 					filter: (file) => file.extension === 'md',
 				},
 			},
 			{
 				name: 'Create an editable template',
-				desc: `Save the built-in template to "${type.templateCopyPath}" and use it, so you can change it.`,
-				action: () => void this.createTemplateCopy(type),
+				desc: `Save the built-in template to "${rows.copyPath}" and use it, so you can change it.`,
+				action: () => void this.createTemplateCopy(rows.copyPath, rows.template, rows.templateKey, rows.noun),
 			},
 		];
 	}
@@ -255,17 +325,16 @@ export class DictionaryNotesSettingTab extends PluginSettingTab {
 		];
 	}
 
-	private async createTemplateCopy(type: AnyLookupType) {
-		const path = type.templateCopyPath;
+	private async createTemplateCopy(path: string, template: string, key: NoteSettingKey, noun: string) {
 		try {
 			if (!this.app.vault.getFileByPath(path)) {
 				await ensureFolder(this.app, path.slice(0, path.lastIndexOf('/')));
-				await this.app.vault.create(path, type.defaultTemplate);
-				new Notice(`Created "${path}". Edit it to change your ${type.noun} notes.`);
+				await this.app.vault.create(path, template);
+				new Notice(`Created "${path}". Edit it to change your ${noun} notes.`);
 			} else {
 				new Notice(`"${path}" already exists. It's now your template.`);
 			}
-			this.plugin.settings[type.settingKeys.templateFile] = path;
+			this.plugin.settings[key] = path;
 			await this.plugin.saveSettings();
 			this.update();
 		} catch (err) {

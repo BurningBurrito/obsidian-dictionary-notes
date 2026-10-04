@@ -82,9 +82,9 @@ function toYaml(value: TemplateValue): string {
 	}
 	const text = collapseWhitespace(value);
 	if (!text) return '';
-	// Leave simple words and ISO dates unquoted; quote everything else.
+	// Leave simple words (in any alphabet: "canción") and ISO dates unquoted; quote everything else.
 	const plain =
 		/^\d{4}-\d{2}-\d{2}$/.test(text) ||
-		(/^[A-Za-z][A-Za-z -]*$/.test(text) && !YAML_RESERVED.test(text) && !text.endsWith(' '));
+		(/^\p{L}[\p{L} -]*$/u.test(text) && !YAML_RESERVED.test(text) && !text.endsWith(' '));
 	return plain ? text : JSON.stringify(text);
 }
