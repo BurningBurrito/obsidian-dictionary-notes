@@ -1,6 +1,6 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update — Spanish definitions: Phase 5 (release 1.2.0) prepared, **waiting for approval**
-**Last updated:** 2026-10-03
+**Current phase:** Update — Spanish definitions: **1.2.0 released**; remaining: dashboard follow-up (user)
+**Last updated:** 2026-10-04
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
 
@@ -86,17 +86,26 @@ approval), 3 build, 4 test, 5 release.
     (run 37174639208); local main.js sha256 005385c9… (49,028 bytes) for comparing with the draft
   - Release notes drafted (shown to the user)
 
+- [x] Release approved (user)
+- [x] **Released 1.2.0**:
+  - Annotated tag `1.2.0` on c7acb7e "Release 1.2.0", pushed; release workflow run 37176527458 passed
+    (tag check, build, attestation, draft)
+  - Draft verified before publishing: 3 assets; manifest 1.2.0 / minAppVersion 1.13.0; main.js
+    (49,028 bytes) and styles.css byte-identical to the local build; manifest identical to the tagged
+    commit; attestation verified (release.yml @ refs/tags/1.2.0, commit c7acb7e)
+  - Published 2026-10-04 04:17 UTC with the release notes, marked latest; public downloads return 200
+  - `main` fast-forwarded to the feature branch (this status commit) and pushed after the release was live
+
 ### In progress
-- [ ] Waiting for approval to release
+- [ ] User, on community.obsidian.md: **Check for new releases**; optionally add Spanish to the long
+      description
 
-### Next (each public step needs approval)
-- [ ] Push tag `1.2.0` → release workflow builds a draft (not visible to users)
-- [ ] Verify draft: 3 assets, manifest 1.2.0, main.js identical to local build, attestation from tag 1.2.0
-- [ ] Publish the release with the notes
-- [ ] Fast-forward `main` to the branch and push (users are offered the update from here)
-- [ ] Dashboard (user): Check for new releases; optionally update the long description (mention Spanish)
-- [ ] Optional: delete the feature branch on GitHub
-
+### Next
+- [ ] Optional: delete `feature/spanish-definitions` on GitHub
+- [ ] Future release (user): Spanish idioms, Spanish quotes (English Wikiquote originals; optionally
+      es.wikiquote), plugin interface in Spanish (`getLanguage()`), Merriam-Webster Spanish-English
+- [ ] Carried over from 1.1.0: screenshots, mobile test, Merriam-Webster test with a real key,
+      work-page authors via Wikidata
 
 ### Decisions made
 - Both kinds of Spanish definitions, chosen per lookup (user). Wikcionario (es.wiktionary.org) is the new
@@ -116,7 +125,7 @@ approval), 3 build, 4 test, 5 release.
 - New settings keys only (nothing renamed); version 1.2.0; es.wiktionary.org added to network disclosure.
 
 ### Open questions / blockers
-- Release approval.
+- (none)
 
 ---
 
