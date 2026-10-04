@@ -50,10 +50,9 @@ describe('Wikcionario (definitions written in Spanish)', () => {
 		await assert.rejects(wikcionario.lookup('zzqxvbn', es), { kind: 'not-found' });
 	});
 
-	it('suggests spellings with accents, not words from other languages', async () => {
-		const suggestions = await spanishSuggestions('cancion');
-		assert.equal(suggestions[0], 'canción');
-		assert.ok(!suggestions.includes('chanson'));
+	it('suggests spellings with accents, not phrases or words from other languages', async () => {
+		// Wikcionario's search also returns "canción de cuna", "nubbevisa" (Swedish), and "chanson" (French).
+		assert.deepEqual(await spanishSuggestions('cancion'), ['canción', 'canciones']);
 	});
 });
 
