@@ -1,5 +1,5 @@
 # Status: Dictionary Notes (`dictionary-notes`)
-**Current phase:** Update — Spanish definitions: Phase 4 (test) done except the Review branch scan (user)
+**Current phase:** Update — Spanish definitions: Phase 5 (release 1.2.0) prepared, **waiting for approval**
 **Last updated:** 2026-10-03
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
@@ -75,11 +75,28 @@ approval), 3 build, 4 test, 5 release.
 - [x] Pushed `feature/spanish-definitions` (user approved; main untouched, no tags). CI green on Node 22
       and 24 (run 37173431482, commit c17b61e)
 
-### In progress
-- [ ] User: dashboard **Review branch** scan of `feature/spanish-definitions`
+- [x] Review branch scan of `feature/spanish-definitions`: **no warnings** (user). **Phase 4 closed**
+- [x] Phase 5 prep:
+  - Release docs rechecked: unchanged since 2026-08-07 (incl. developer policies; README discloses the
+    new service es.wiktionary.org)
+  - minAppVersion 1.13.0 still right: no new Obsidian APIs (Intl.DisplayNames is a browser API)
+  - Version **1.2.0** (minor: new features, nothing breaks): commit c7acb7e "Release 1.2.0" (manifest,
+    package, package-lock, versions.json "1.2.0": "1.13.0"); no tag yet
+  - Release candidate: build, lint, lint without moment types, 103/103 tests; CI green on Node 22 and 24
+    (run 37174639208); local main.js sha256 005385c9… (49,028 bytes) for comparing with the draft
+  - Release notes drafted (shown to the user)
 
-### Next
-- [ ] Phase 3: build · Phase 4: test · Phase 5: release (GitHub release; the plugin is listed)
+### In progress
+- [ ] Waiting for approval to release
+
+### Next (each public step needs approval)
+- [ ] Push tag `1.2.0` → release workflow builds a draft (not visible to users)
+- [ ] Verify draft: 3 assets, manifest 1.2.0, main.js identical to local build, attestation from tag 1.2.0
+- [ ] Publish the release with the notes
+- [ ] Fast-forward `main` to the branch and push (users are offered the update from here)
+- [ ] Dashboard (user): Check for new releases; optionally update the long description (mention Spanish)
+- [ ] Optional: delete the feature branch on GitHub
+
 
 ### Decisions made
 - Both kinds of Spanish definitions, chosen per lookup (user). Wikcionario (es.wiktionary.org) is the new
@@ -99,7 +116,7 @@ approval), 3 build, 4 test, 5 release.
 - New settings keys only (nothing renamed); version 1.2.0; es.wiktionary.org added to network disclosure.
 
 ### Open questions / blockers
-- Review branch scan result (needed before tagging 1.2.0).
+- Release approval.
 
 ---
 
