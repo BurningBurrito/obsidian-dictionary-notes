@@ -1,6 +1,6 @@
 {
 	"name": "dictionary-notes",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Build a dictionary in your vault: look up definitions, idioms, and quotes, and save each one as a note using your own templates.",
 	"main": "main.js",
 	"type": "module",
