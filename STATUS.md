@@ -111,6 +111,8 @@ approval), 3 build, 4 test, 5 release.
       es.wikiquote), plugin interface in Spanish (`getLanguage()`), Merriam-Webster Spanish-English
 - [ ] Carried over from 1.1.0: screenshots, mobile test, Merriam-Webster test with a real key,
       work-page authors via Wikidata
+- [ ] A screenshot or short GIF of a lookup creating a note would also replace the mockup on the
+      tonyherrera.org project card (listed in that repo's STATUS.md)
 
 ### Decisions made
 - Both kinds of Spanish definitions, chosen per lookup (user). Wikcionario (es.wiktionary.org) is the new
