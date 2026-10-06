@@ -1,6 +1,25 @@
 # Status: Dictionary Notes (`dictionary-notes`)
 **Current phase:** Update — Spanish definitions: **1.2.0 released and complete**
-**Last updated:** 2026-10-04
+**Last updated:** 2026-10-05
+
+## Maintenance: Claude removed from GitHub contributors (2026-10-05)
+
+- GitHub listed "claude" as a contributor because every commit carried a `Co-Authored-By: Claude …`
+  trailer (all 36 commits on main; all authored by BurningBurrito).
+- Future commits: attribution turned off for all projects in `~/.claude/settings.json`
+  (`"attribution": {"commit": "", "pr": "", "sessionUrl": false}`; object form works on every version).
+- History: user approved rewriting `main` to remove the trailer from all 36 messages
+  (`git filter-branch --msg-filter`). Verified before pushing: same 36 commits, identical tree IDs
+  (files byte-identical), same authors/committers/dates, every message equal to the old one minus the
+  trailer. `main` force-pushed with a lease (old tip f7b5971 → rewritten tip 699e44a, plus this note).
+- Release tags 1.0.0, 1.0.1, 1.1.0, 1.2.0 and their releases were **not** changed (moving published tags
+  would break the release-to-build attestations). Commit IDs written elsewhere in this file refer to the
+  original history: those up to 1.2.0 are still reachable through the tags; the later status-only commits
+  are kept in the local branch `backup/main-before-rewrite`.
+- GitHub says contributor displays take about 24 hours to refresh after a history rewrite.
+- Any other clone must re-sync before committing: `git fetch && git reset --hard origin/main`.
+
+---
 
 ## Update: Spanish definitions (branch `feature/spanish-definitions`)
 
