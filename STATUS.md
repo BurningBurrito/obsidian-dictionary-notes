@@ -1,6 +1,6 @@
 # Status: Dictionary Notes (`dictionary-notes`)
 **Current phase:** Update — Spanish definitions: **1.2.0 released and complete**
-**Last updated:** 2026-10-06
+**Last updated:** 2026-10-08
 
 ## Maintenance: Claude removed from GitHub contributors (2026-10-05)
 
@@ -124,6 +124,7 @@ approval), 3 build, 4 test, 5 release.
 - [x] Portfolio card merged with Library Notes (the user's second plugin) into one "Obsidian Plugins" card
       on tonyherrera.org (user, 2026-10-06, TonyHerreraWebsite 91a87d8); Dictionary Notes keeps its own row
       linking to its community directory page and repo
+- [x] Card now covers three plugins: Watchlist Notes added (user, 2026-10-08, TonyHerreraWebsite 37218b8)
 - [x] Secret scan (user, 2026-10-04): gitleaks 8.30.1 (checksum verified) on the full history (34
       commits) and working tree, **no findings**; recorded fixtures (`tests/fixtures/http/*.gz`)
       checked by hand: no API keys or tokens, and no Merriam-Webster requests recorded
